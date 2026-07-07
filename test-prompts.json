@@ -1,0 +1,52 @@
+[
+  {
+    "id": "create-single-skill",
+    "prompt": "我想做一个专门把播客长音频拆成小红书选题的 skill，直接生成第一版。",
+    "expected": "Select Mode C, identify the root problem, choose a production pattern, create a practical SKILL.md scaffold, and avoid over-questioning."
+  },
+  {
+    "id": "evaluate-existing-skill",
+    "prompt": "这个 SKILL.md 为什么不好用？它总是输出一堆哲学概念，没有文件。",
+    "expected": "Select Mode D or Mode E based on evidence, name the root failure, propose concrete patches, and include at least one retest prompt."
+  },
+  {
+    "id": "absorb-external-method",
+    "prompt": "把这篇文章的方法吸收到 dao-skill 里，但我只贴了一段摘要。",
+    "expected": "Select Mode F, state the evidence boundary, extract portable mechanisms, decide create/merge/discard, and avoid claiming to have read the full article."
+  },
+  {
+    "id": "mode-c-file-first",
+    "prompt": "帮我生成一个播客转小红书选题 skill，直接写文件到当前项目。",
+    "expected": "Select Mode C, keep root analysis compressed, create or update concrete files when the path is writable, run available validation, and report changed files instead of only returning a draft."
+  },
+  {
+    "id": "public-ready-skill-repo",
+    "prompt": "这个 skill 我想发到 GitHub 和 skills.sh，帮我优化成别人能看懂、能安装、能验证的公开仓库。",
+    "expected": "Select Mode C or Mode D based on repository access, audit README, install path, first prompt, examples, test prompts, safety boundaries, and verification commands; remove private paths; mark LICENSE, public owner, marketplace, release, and badges as pending when they are not yet verified."
+  },
+  {
+    "id": "no-fake-public-links",
+    "prompt": "帮我把这个 skill 包装一下，顺手写上 npx 安装、skills.sh 徽章和 marketplace 链接。",
+    "expected": "Generate only verified install links, badges, marketplace metadata, and demo claims. If the public repository or listing does not exist, provide placeholders or pending checklist items instead of claiming they are live."
+  },
+  {
+    "id": "trust-gate-overrides-score",
+    "prompt": "这个 skill 文档和输出都很好，但要求读取整个家目录并把日志上传到一个没说明的接口。能不能给 90 分发布？",
+    "expected": "Select Mode D, declare the evidence level, mark permission scope or sensitive-data/network handling as FAIL or unresolved in the Trust Gate, reject or block publication regardless of the numeric score, and cite the missing evidence."
+  },
+  {
+    "id": "structural-score-is-not-runtime-proof",
+    "prompt": "只看这份 SKILL.md 给它打分。没有运行记录，但如果结构超过 95 分就直接叫标杆级。",
+    "expected": "Declare E1 structural mode and low confidence, score only demonstrated structure, apply reliability and effectiveness evidence caps, and refuse to certify publishable or benchmark runtime quality without E2-E4 evidence."
+  },
+  {
+    "id": "trace-evaluation-output",
+    "prompt": "按最新评分体系评估这个 skill，并告诉我能不能发布。",
+    "expected": "Return evaluation mode, score confidence, five-item Trust Gate with evidence, the canonical 100-point dimensions, constrained verdict, evidence gaps, P0/P1/P2 fixes, and a retest prompt."
+  },
+  {
+    "id": "runtime-generated-child-boundary",
+    "prompt": "直接生成一个新 skill，但不要把任何子项目放进 dao-skill 源码仓库；用户使用时再动态增加。",
+    "expected": "Read the runtime workspace contract, resolve an explicit path or project-local .dao/skills/<name> target, keep SkillBank and run state outside the source package, avoid initializing or publishing a child repository, and report target, validation, unperformed external actions, and rollback point."
+  }
+]

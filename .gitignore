@@ -1,0 +1,47 @@
+# Operating-system and editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*~
+
+# Python and test caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Temporary files and historical local backups
+*.bak
+*.bak.*
+*.tmp
+*.log
+/.tmp/
+/.firecrawl/
+
+# Runtime-generated user data. These are created while using dao-skill and
+# must remain outside the public source package.
+/.dao/
+/skill-bank/
+/generated-skills/
+/output/
+/runs/
+
+# Independent/generated child skill repositories kept in this maintainer's
+# local workspace. The public repository contains only dao-skill itself.
+/content-to-skill/
+/find-skill/
+/how-to-understand-anything-skill/
+/knowledge-cat-ppt-skill/
+/examples/*/
