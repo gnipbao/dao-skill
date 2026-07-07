@@ -14,9 +14,11 @@ REQUIRED_FILES = {
     ".gitignore",
     "README.md",
     "SKILL.md",
+    "LICENSE",
     "CONTRIBUTING.md",
     "SECURITY.md",
     "agents/openai.yaml",
+    "assets/dao-skill-banner.png",
     "references/runtime-workspace.md",
     "scripts/quality_check.py",
     "scripts/evolution_check.py",
@@ -108,7 +110,7 @@ def check(root: Path, strict_license: bool) -> tuple[list[str], list[str]]:
                 errors.append(f"Possible {label} in {rel}")
 
     readme = (root / "README.md").read_text(encoding="utf-8") if (root / "README.md").is_file() else ""
-    for marker in ("## 仓库边界", "## 动态生成规则", "scripts/repository_check.py"):
+    for marker in ("## 仓库边界：子 Skill 动态生成", "## 本地验证", "scripts/repository_check.py"):
         if marker not in readme:
             errors.append(f"README.md is missing publication marker: {marker}")
 
