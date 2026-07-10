@@ -74,17 +74,17 @@ This is a review gate, not a malware scanner. Static reading cannot prove that c
 
 ## 2. Scorecard
 
-```md
-根问题与适用性：0-15
-流程可靠性：0-20
-结果有效性：0-20
-边界与可信披露：0-10
-规范与维护性：0-10
-组合与交接能力：0-10
-证据与验证闭环：0-10
-可进化性：0-5
-总分：100
-```
+| Dimension | Maximum |
+|---|---:|
+| 根问题与适用性 | 15 |
+| 流程可靠性 | 20 |
+| 结果有效性 | 20 |
+| 边界与可信披露 | 10 |
+| 规范与维护性 | 10 |
+| 组合与交接能力 | 10 |
+| 证据与验证闭环 | 10 |
+| 可进化性 | 5 |
+| **总分** | **100** |
 
 Every dimension needs at least one evidence citation: file section, example, test result, execution trace, or observed failure. When evidence is missing, score the demonstrated artifact rather than the author's intention.
 

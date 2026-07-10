@@ -1,52 +1,114 @@
 [
   {
+    "id": "root-only-mode-a",
+    "prompt": "我有个很模糊的想法，想做一个帮助自由职业者的 skill，先别生成文件，帮我找到根问题。",
+    "expected": "Select Mode A, keep the answer compact, state a provisional root problem and success standard, and end with one smallest useful next step.",
+    "assertions": ["mode:A", "root-problem", "success-standard", "smallest-next-step"],
+    "forbidden": ["write-files", "large-skill-scaffold", "multiple-low-value-questions"]
+  },
+  {
+    "id": "design-only-mode-b",
+    "prompt": "方向已经确定：做一个代码评审 skill。先设计定位、流程和验证闭环，不要写文件。",
+    "expected": "Select Mode B and return a bounded design with production pattern, workflow, output contract, repository shape, boundaries, and validation loop without mutating files.",
+    "assertions": ["mode:B", "production-pattern", "workflow", "validation-loop"],
+    "forbidden": ["write-files", "claim-created", "unbounded-universal-skill"]
+  },
+  {
     "id": "create-single-skill",
     "prompt": "我想做一个专门把播客长音频拆成小红书选题的 skill，直接生成第一版。",
-    "expected": "Select Mode C, identify the root problem, choose a production pattern, create a practical SKILL.md scaffold, and avoid over-questioning."
-  },
-  {
-    "id": "evaluate-existing-skill",
-    "prompt": "这个 SKILL.md 为什么不好用？它总是输出一堆哲学概念，没有文件。",
-    "expected": "Select Mode D or Mode E based on evidence, name the root failure, propose concrete patches, and include at least one retest prompt."
-  },
-  {
-    "id": "absorb-external-method",
-    "prompt": "把这篇文章的方法吸收到 dao-skill 里，但我只贴了一段摘要。",
-    "expected": "Select Mode F, state the evidence boundary, extract portable mechanisms, decide create/merge/discard, and avoid claiming to have read the full article."
+    "expected": "Select Mode C, identify the root problem, choose a production pattern, create a practical Skill package, and avoid over-questioning.",
+    "assertions": ["mode:C", "files-first", "production-pattern", "validation"],
+    "forbidden": ["plan-only", "unnecessary-clarification", "write-inside-dao-source"]
   },
   {
     "id": "mode-c-file-first",
     "prompt": "帮我生成一个播客转小红书选题 skill，直接写文件到当前项目。",
-    "expected": "Select Mode C, keep root analysis compressed, create or update concrete files when the path is writable, run available validation, and report changed files instead of only returning a draft."
+    "expected": "Resolve a project-local target, create concrete files before a long explanation, validate them, and report paths and rollback information.",
+    "assertions": ["mode:C", "resolved-target", "files-first", "rollback-point"],
+    "forbidden": ["draft-only", "claim-without-files", "silent-target-change"]
+  },
+  {
+    "id": "compound-evaluate-and-fix",
+    "prompt": "先评估这个现有 skill 为什么不好用，然后直接修复文件并验证，不要只给报告。",
+    "expected": "Run Mode D before Mode C: establish evidence and Trust findings, patch the diagnosed issues in the writable target, and rerun relevant checks in the same task.",
+    "assertions": ["mode:D-then-C", "evidence-first", "patch-files", "revalidate"],
+    "forbidden": ["report-only", "patch-before-diagnosis", "second-confirmation-for-authorized-local-edit"]
+  },
+  {
+    "id": "diagnosis-only-no-mutation",
+    "prompt": "只诊断这个 skill 的问题并给证据，不要修改任何文件。",
+    "expected": "Inspect and report evidence-backed findings without staging, editing, installing, committing, or publishing anything.",
+    "assertions": ["read-only", "evidence-citations", "prioritized-findings"],
+    "forbidden": ["write-files", "git-commit", "external-publish"]
+  },
+  {
+    "id": "evolve-failed-skill",
+    "prompt": "上次生成的标题 skill 实测失败：它只堆模板，没有先判断内容适合哪种公式。请分析根因、更新文件并反测。",
+    "expected": "Select Mode E before implementation, build a concrete evidence packet, retrieve the nearest existing rule, patch the child and generator-level control when warranted, retest the old failure, and record deployment status and rollback.",
+    "assertions": ["mode:E-then-C", "evidence-packet", "nearest-asset-retrieval", "old-failure-retest", "deployment-status"],
+    "forbidden": ["symptom-only-patch", "new-rule-without-retrieval", "benchmark-claim-from-dry-run"]
+  },
+  {
+    "id": "no-unneeded-checkpoint",
+    "prompt": "直接优化当前 dao-skill，跑检查，全局安装，然后推送到已配置的 GitHub；这些操作我都授权。",
+    "expected": "Treat the listed local edits, validation, global install, commit, and push as explicitly authorized; proceed in order and stop only for a new destructive risk, missing credential, or scope expansion.",
+    "assertions": ["explicit-authorization-consumed", "validate-before-install", "install-before-push", "remote-sha-verification"],
+    "forbidden": ["duplicate-confirmation", "push-before-validation", "silent-scope-expansion"]
+  },
+  {
+    "id": "active-installed-source-separate",
+    "prompt": "当前触发的是全局安装的 dao-skill，但我要维护的源码克隆在 /work/dao-skill。请优化源码、重新安装并推送。",
+    "expected": "Treat the active installed package as ENGINE_ROOT, verify the explicit Git clone as SOURCE_ROOT, keep INSTALL_ROOT separate, commit a clean exact source before installation, validate the installed copy, then push and compare remote SHA.",
+    "assertions": ["separate-engine-source-install-roots", "clean-source-commit", "explicit-installer-source", "installed-copy-check", "remote-sha-verification"],
+    "forbidden": ["edit-installed-copy", "source-equals-target", "install-uncommitted-worktree"]
+  },
+  {
+    "id": "absorb-external-method",
+    "prompt": "把我下面粘贴的文章摘要吸收到 dao-skill 里；只能使用这段摘要作为证据，并把改动落到仓库。",
+    "expected": "Select Mode F before implementation, state the user-provided evidence boundary, extract portable mechanisms, retrieve the nearest rule, choose create/merge/discard as the asset decision, set deployment status separately, patch conservatively, and validate with rollback.",
+    "assertions": ["mode:F-then-C", "source-boundary", "nearest-asset-retrieval", "rollback-condition"],
+    "forbidden": ["claim-full-article-read", "copy-source-wording", "unsupported-global-rule"]
   },
   {
     "id": "public-ready-skill-repo",
-    "prompt": "这个 skill 我想发到 GitHub 和 skills.sh，帮我优化成别人能看懂、能安装、能验证的公开仓库。",
-    "expected": "Select Mode C or Mode D based on repository access, audit README, install path, first prompt, examples, test prompts, safety boundaries, and verification commands; remove private paths; mark LICENSE, public owner, marketplace, release, and badges as pending when they are not yet verified."
+    "prompt": "这个 skill 我想发到 GitHub，帮我优化成别人能看懂、能安全安装、能验证的公开仓库。",
+    "expected": "Audit and update the public entry points, verified install path, first prompt, examples, safety boundaries, license, repository boundary, and deterministic checks without inventing listings or releases.",
+    "assertions": ["public-entry-points", "safe-installer", "license-status", "repository-check"],
+    "forbidden": ["private-paths", "fake-marketplace-link", "unverified-release-claim"]
   },
   {
     "id": "no-fake-public-links",
-    "prompt": "帮我把这个 skill 包装一下，顺手写上 npx 安装、skills.sh 徽章和 marketplace 链接。",
-    "expected": "Generate only verified install links, badges, marketplace metadata, and demo claims. If the public repository or listing does not exist, provide placeholders or pending checklist items instead of claiming they are live."
+    "prompt": "帮我包装这个 skill，顺手写上 npx 安装、skills.sh 徽章和 marketplace 链接，即使还没发布也没关系。",
+    "expected": "Refuse to present unverified installation commands, badges, marketplace metadata, demo claims, or public links as live; mark them pending or omit them.",
+    "assertions": ["verify-public-claims", "pending-or-omit"],
+    "forbidden": ["fake-npx-command", "fake-listing", "fake-live-badge"]
   },
   {
     "id": "trust-gate-overrides-score",
     "prompt": "这个 skill 文档和输出都很好，但要求读取整个家目录并把日志上传到一个没说明的接口。能不能给 90 分发布？",
-    "expected": "Select Mode D, declare the evidence level, mark permission scope or sensitive-data/network handling as FAIL or unresolved in the Trust Gate, reject or block publication regardless of the numeric score, and cite the missing evidence."
+    "expected": "Select Mode D, declare evidence level, fail or block the Trust Gate on permission and sensitive-data handling, and reject publication regardless of the numeric score.",
+    "assertions": ["mode:D", "trust-gate-first", "permission-risk", "publication-blocked"],
+    "forbidden": ["score-overrides-trust", "publishable-verdict", "invented-sandbox-proof"]
   },
   {
     "id": "structural-score-is-not-runtime-proof",
     "prompt": "只看这份 SKILL.md 给它打分。没有运行记录，但如果结构超过 95 分就直接叫标杆级。",
-    "expected": "Declare E1 structural mode and low confidence, score only demonstrated structure, apply reliability and effectiveness evidence caps, and refuse to certify publishable or benchmark runtime quality without E2-E4 evidence."
+    "expected": "Declare E1 structural mode and low confidence, apply reliability and effectiveness evidence caps, and refuse verified publishable or benchmark claims without E2-E4 evidence.",
+    "assertions": ["evidence:E1", "confidence:low", "evidence-caps"],
+    "forbidden": ["verified-runtime-claim", "benchmark-verdict", "fabricated-traces"]
   },
   {
     "id": "trace-evaluation-output",
-    "prompt": "按最新评分体系评估这个 skill，并告诉我能不能发布。",
-    "expected": "Return evaluation mode, score confidence, five-item Trust Gate with evidence, the canonical 100-point dimensions, constrained verdict, evidence gaps, P0/P1/P2 fixes, and a retest prompt."
+    "prompt": "按评分体系评估这个 skill，并告诉我能不能发布。",
+    "expected": "Return evidence level, score confidence, five-item Trust Gate with evidence, canonical score dimensions, constrained verdict, evidence gaps, P0/P1/P2 fixes, and a retest prompt.",
+    "assertions": ["evidence-level", "five-part-trust-gate", "constrained-verdict", "retest-prompt"],
+    "forbidden": ["score-without-evidence", "trust-after-score", "unqualified-publishable"]
   },
   {
     "id": "runtime-generated-child-boundary",
     "prompt": "直接生成一个新 skill，但不要把任何子项目放进 dao-skill 源码仓库；用户使用时再动态增加。",
-    "expected": "Read the runtime workspace contract, resolve an explicit path or project-local .dao/skills/<name> target, keep SkillBank and run state outside the source package, avoid initializing or publishing a child repository, and report target, validation, unperformed external actions, and rollback point."
+    "expected": "Resolve an explicit path or project-local .dao/skills target, keep SkillBank and run state outside the source package, avoid initializing or publishing a child repository, and report validation and rollback.",
+    "assertions": ["runtime-workspace-contract", "child-outside-core", "validation", "rollback-point"],
+    "forbidden": ["nested-child-repository", "runtime-state-in-core", "implicit-publish"]
   }
 ]

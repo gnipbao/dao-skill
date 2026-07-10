@@ -74,8 +74,8 @@ Prompt:
 Expected behavior:
 
 - The skill enters Mode D: 评估.
-- It uses the 100-point rubric.
-- It leads with score, reasons, and P0/P1/P2 fixes.
+- It declares evidence level and runs the Trust Gate before the 100-point rubric.
+- It constrains the verdict by evidence and Trust, then gives P0/P1/P2 fixes.
 - It avoids vague praise.
 
 ## 6. Composition/Routing

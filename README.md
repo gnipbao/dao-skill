@@ -12,7 +12,7 @@
 <p align="center">
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-0f766e.svg" /></a>
   <img alt="Python: standard library" src="https://img.shields.io/badge/Python-stdlib_only-334155.svg" />
-  <img alt="Status: open source ready" src="https://img.shields.io/badge/Status-open_source_ready-b7791f.svg" />
+  <img alt="Python 3.9+" src="https://img.shields.io/badge/Python-3.9%2B-334155.svg" />
 </p>
 
 ---
@@ -57,21 +57,48 @@
 
 ## 安装
 
-仓库发布到 GitHub 后，克隆到 Codex 的本地 Skill 目录：
+需要 Python 3.9+，安装器只使用标准库。先克隆源码到任意维护目录：
 
 ```bash
-git clone https://github.com/gnipbao/dao-skill.git \
-  "${CODEX_HOME:-$HOME/.codex}/skills/dao-skill"
+git clone https://github.com/gnipbao/dao-skill.git
+cd dao-skill
 ```
 
-如果已克隆到其他目录，也可以复制源码：
+先预览安装清单，再原子安装到 `${CODEX_HOME:-$HOME/.codex}/skills/dao-skill`：
 
 ```bash
-mkdir -p "${CODEX_HOME:-$HOME/.codex}/skills"
-cp -R /path/to/dao-skill "${CODEX_HOME:-$HOME/.codex}/skills/dao-skill"
+python3 scripts/install.py --dry-run
+python3 scripts/install.py
 ```
 
-安装或更新后，新建一个 Codex 会话，让 Skill 列表重新加载。
+Windows PowerShell 使用 `py -3` 代替 `python3`。如目标已存在，安装器会要求显式使用 `--force`；默认安装的旧版本会保存在 `${CODEX_HOME:-$HOME/.codex}/backups/dao-skill/default/<timestamp>/`，不会留在可发现的 `skills/` 目录里。
+
+更新：
+
+```bash
+git pull --ff-only
+python3 scripts/run_checks.py
+python3 scripts/install.py --dry-run
+python3 scripts/install.py --force
+```
+
+需要回滚（包括首次从旧版升级）时，使用安装器输出的真实备份路径：
+
+```bash
+python3 scripts/install.py --restore-backup /path/from/installer/output --dry-run
+python3 scripts/install.py --restore-backup /path/from/installer/output
+```
+
+自定义安装位置必须在安装、更新和回滚时重复传入同一个 `--target`；可用 `--state-dir` 把暂存与备份固定到另一个非 Skill 扫描目录。安装或更新后，新建 Codex 会话，让 Skill 列表重新加载。
+
+```bash
+python3 scripts/install.py \
+  --target /path/to/custom-skills/dao-skill \
+  --state-dir /path/to/private-installer-state \
+  --dry-run
+```
+
+`main` 会持续演进；需要完全可复现的安装时，请在安装前检出一个已验证的 tag 或 commit SHA。
 
 ## 第一次调用
 
@@ -122,6 +149,8 @@ dao-skill/
 ├── references/                 # 按需加载的框架、模板与标准
 ├── examples/*.md               # 行为示例，不包含完整子项目
 ├── scripts/                    # 标准库验证工具
+│   ├── install.py              # 安全、可回滚的全局安装器
+│   └── run_checks.py           # 单一完整验证入口
 ├── test-prompts.json           # 回归提示词
 ├── SECURITY.md
 ├── CONTRIBUTING.md
@@ -132,16 +161,15 @@ dao-skill/
 
 ## 本地验证
 
-所有检查只依赖 Python 标准库：
+源码仓库运行一条命令即可完成结构、进化、评分、静态行为契约、发布边界、安装器和验证器回归检查：
 
 ```bash
-python3 scripts/quality_check.py .
-python3 scripts/evolution_check.py .
-python3 scripts/evaluation_check.py .
-python3 scripts/repository_check.py . --strict-license
+python3 scripts/run_checks.py
 ```
 
-检查内容包括：Skill 结构、进化协议、评分体系、私有路径/密钥风险、子项目与运行时文件是否越过发布边界。
+安装后的 Skill 也可以运行同一命令；它会自动跳过只适用于 Git 源码仓库的发布检查。静态行为契约只验证测试夹具与控制规则是否齐全，不等同于真实模型回放；没有执行记录时，证据仍应标为 E1/E2。
+
+CI 在 Linux、macOS 和 Windows 上运行同一套标准库检查。
 
 ## 设计原则
 
@@ -149,7 +177,7 @@ python3 scripts/repository_check.py . --strict-license
 - **文件优先**：用户要求生成时，不能只给计划或草稿说明。
 - **证据优先**：没有运行证据，就不宣称已验证或达到标杆级。
 - **Trust 是硬门槛**：高分不能抵消权限、隐私或依赖风险。
-- **先检索再新增**：新经验先决定 create、merge、discard 或 quarantine。
+- **先检索再新增**：资产只决定 create、merge 或 discard；部署状态单独记录 accepted、provisional、quarantined 或 rejected。
 - **进化必须可回滚**：每次改变都要有反测、通过信号和回滚条件。
 - **核心与运行时分离**：用户生成数据不污染公开源码。
 
