@@ -91,3 +91,19 @@ Expected behavior:
 - The skill stays in Dao mode first.
 - It distinguishes root-finding from Nuwa-style distillation and Colleague-style replication.
 - It proposes a skill family architecture instead of one oversized skill.
+
+## 7. Optimize An Existing Skill
+
+Prompt:
+
+```md
+使用 $dao-skill：把当前 skill 优化到最好的版本，直接修改文件并验证。
+```
+
+Expected behavior:
+
+- The skill enters Mode D before Mode C because no concrete failed output was supplied.
+- It defines “better” from the declared scope and captures a validation baseline before editing.
+- It patches the highest-leverage P0/P1 gaps while preserving existing success behavior and unrelated changes.
+- It separates deterministic structural checks from real prompt replay or independent evidence.
+- It reports residual uncertainty instead of claiming an absolute or benchmark-level best.

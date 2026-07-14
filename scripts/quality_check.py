@@ -16,22 +16,32 @@ NAME_RE = re.compile(r"^[a-z0-9-]+$")
 
 
 def parse_frontmatter(text: str) -> tuple[dict[str, str], str]:
-    if not text.startswith("---\n"):
+    lines = text.splitlines(keepends=True)
+    if not lines or lines[0].rstrip("\r\n") != "---":
         raise ValueError("SKILL.md must start with YAML frontmatter")
-    end = text.find("\n---", 4)
-    if end == -1:
+    closing_line = next(
+        (index for index, line in enumerate(lines[1:], start=1) if line.rstrip("\r\n") == "---"),
+        None,
+    )
+    if closing_line is None:
         raise ValueError("SKILL.md frontmatter is not closed")
-    raw = text[4:end].strip()
-    body = text[end + 4 :]
+    raw = "".join(lines[1:closing_line]).strip()
+    body = "".join(lines[closing_line + 1 :])
     data: dict[str, str] = {}
     current_key: str | None = None
     block_lines: list[str] = []
+
+    def store(key: str, value: str) -> None:
+        if key in data:
+            raise ValueError(f"Duplicate frontmatter field: {key}")
+        data[key] = value
+
     for line in raw.splitlines():
         if current_key and (line.startswith(" ") or line.startswith("\t")):
             block_lines.append(line.strip())
             continue
         if current_key:
-            data[current_key] = "\n".join(block_lines).strip()
+            store(current_key, "\n".join(block_lines).strip())
             current_key = None
             block_lines = []
         if not line.strip():
@@ -40,14 +50,18 @@ def parse_frontmatter(text: str) -> tuple[dict[str, str], str]:
             raise ValueError(f"Invalid frontmatter line: {line}")
         key, value = line.split(":", 1)
         key = key.strip()
+        if not key:
+            raise ValueError(f"Invalid frontmatter line: {line}")
         value = value.strip()
         if value in {"|", ">"}:
+            if key in data:
+                raise ValueError(f"Duplicate frontmatter field: {key}")
             current_key = key
             block_lines = []
         else:
-            data[key] = value.strip('"').strip("'")
+            store(key, value.strip('"').strip("'"))
     if current_key:
-        data[current_key] = "\n".join(block_lines).strip()
+        store(current_key, "\n".join(block_lines).strip())
     return data, body
 
 
@@ -81,12 +95,17 @@ def check_skill(path: Path, profile: str = "generic") -> list[str]:
     missing = REQUIRED_FRONTMATTER - set(frontmatter)
     if missing:
         issues.append(f"Missing frontmatter field(s): {', '.join(sorted(missing))}")
+    extra = set(frontmatter) - REQUIRED_FRONTMATTER
+    if extra:
+        issues.append(f"Unexpected frontmatter field(s): {', '.join(sorted(extra))}")
 
     name = frontmatter.get("name", "").strip()
     if not name:
         issues.append("Skill name must not be empty")
     if name and not NAME_RE.match(name):
         issues.append("Skill name must use lowercase hyphen-case")
+    if name and (name.startswith("-") or name.endswith("-") or "--" in name):
+        issues.append("Skill name must not start or end with a hyphen or contain consecutive hyphens")
     if len(name) > 64:
         issues.append("Skill name must be 64 characters or fewer")
 
@@ -100,6 +119,8 @@ def check_skill(path: Path, profile: str = "generic") -> list[str]:
 
     if not body.strip():
         issues.append("SKILL.md body must not be empty")
+    if len(body.splitlines()) > 500:
+        issues.append("SKILL.md body must be 500 lines or fewer; move details into linked references")
 
     semantic_body = strip_nonsemantic_markdown(body)
     headings = markdown_headings(semantic_body)

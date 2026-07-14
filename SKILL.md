@@ -1,6 +1,6 @@
 ---
 name: dao-skill
-description: 道生万元技能：从模糊需求归根，设计、生成、评估、发布或基于证据进化可运行的 Agent Skill。Use when the user wants to create a skill or skill family, find a skill's root problem, turn a method or worldview into an executable workflow, evaluate or publish an existing skill, learn from failed outputs, absorb an article or repository, or design a self-evolving SkillBank; also trigger on 道.skill、道生万 skill、我想做一个 skill、帮我生成 skill 架构、评估这个 skill、帮我进化这个 skill、吸收到体系、自主进化、技能自进化。
+description: 道生万 · Agent Skill 元设计器：从模糊需求归根，设计、生成、审计、优化、发布准备或基于证据进化可运行的 Skill。Use when the user wants to create a Skill or Skill family; find a Skill's root problem; evaluate, refactor, harden, optimize, or prepare an existing Skill repository for publication; turn a method, worldview, article, or repository into an executable Skill system; learn from failed outputs; or design a self-evolving SkillBank. Also trigger on 道.skill、道生万 skill、我想做一个 skill、帮我生成 skill 架构、评估这个 skill、优化这个 skill、帮我进化这个 skill、吸收到 Skill 体系、自主进化、技能自进化。
 ---
 
 # 道 Skill
@@ -14,6 +14,7 @@ Daoist language is allowed only when it changes a decision, workflow step, outpu
 ## Non-Negotiables
 
 - Solve the root problem, not the user's first phrasing.
+- Interpret “best” as the smallest evidence-backed improvement for the declared scope, not the longest prompt, highest self-score, or largest feature set.
 - Produce files when the user asks for files and a writable target exists.
 - Treat Trust as a hard gate; strong prose or a high score cannot compensate for unsafe permissions, sensitive-data leakage, opaque dependencies, or an unfit environment.
 - Separate source code from user-owned runtime state and generated child Skills.
@@ -56,7 +57,7 @@ Select the primary mode before producing a long answer.
 | Vague idea, metaphor, or early pain point | A · 归根 | Root problem and smallest next step |
 | Direction is clear, artifact shape is not | B · 设计 | Positioning, workflow, structure, validation plan |
 | User asks to start, generate, edit, install, or publish | C · 生成 | Files first, then validation and handoff |
-| User asks whether an existing Skill is good or publishable | D · 评估 | Evidence level, Trust Gate, score, verdict, prioritized fixes |
+| User asks to review, score, optimize, refactor, harden, or publish an existing Skill | D · 评估 | Evidence level, Trust Gate, score, verdict, prioritized fixes |
 | User reports a failure, mismatch, or version comparison | E · 返观进化 | Postmortem, conservative patch, retest, rollback |
 | User asks to absorb external material or build self-evolution | F · 自化吸收 | Source boundary, mechanism extraction, merge decision, validated update |
 
@@ -67,11 +68,23 @@ When several triggers match, use the strongest evidence mode first: F, E, D, C, 
 A primary mode does not cancel an explicitly requested action:
 
 - “评估并直接修复” means D first, then C in the same run when the target is writable.
+- “优化 / 重构 / 加固到最好” without a concrete failure means D first, then C; with a concrete failed output, use E first, then C.
 - “分析失败并更新” means E first, then patch files and validate.
 - “吸收这篇文章并落到仓库” means F first, then apply the smallest accepted update.
 - “优化、全局安装并推送” means inspect and patch locally, validate, install only after local success, then publish only because the external action was explicitly authorized.
 
 Do not stop after a report when the user also asked for implementation. Do not mutate files when the user asked only for diagnosis or review.
+
+## Optimization Contract
+
+When asked to optimize an existing Skill:
+
+1. Define “better” from the Skill's declared users, root problem, Trust boundary, and tested success signals; do not optimize for prose volume or rubric gaming.
+2. Capture the baseline before editing: source status, strongest evidence level, deterministic checks, preserved behavior, and up to three highest-leverage defects.
+3. Choose D -> C for a general audit-and-improve request or E -> C when a concrete failure trace exists.
+4. Patch the smallest set of instructions, fixtures, references, metadata, or scripts that changes future behavior; preserve unrelated user changes.
+5. Re-run the old success checks and a retest that targets the diagnosed gap. Report structural checks separately from real prompt replay or independent evidence.
+6. Stop when no in-scope P0/P1 defect remains, further changes lack evidence, or the next improvement needs new authority or user-specific judgment. State the residual P2 items instead of claiming an absolute best.
 
 ## Authorization And CHECKPOINT / STOP
 
@@ -168,7 +181,7 @@ Read `references/evolution-protocol.md`. Build the evidence packet, reopen the r
 
 Read `references/self-evolving-skill-system.md`. Extract portable mechanisms rather than wording or unsupported claims. Record the source boundary, compare the nearest rule, choose the asset decision create/merge/discard, set deployment status accepted/provisional/quarantined/rejected, patch the smallest durable asset, validate, and define rollback.
 
-### 7. 机: Execute The Evolution Machine
+### 6. 机 · Execute The Evolution Machine
 
 When a local repository or SkillBank must actually evolve:
 
@@ -197,8 +210,8 @@ When the target is dao-skill itself, classify the active paths as source reposit
 1. Resolve and verify `SOURCE_ROOT` separately from `ENGINE_ROOT`; inspect source Git status, remote, and existing installation. If no source root is available, stop and request the clone/path rather than editing the installed copy.
 2. Patch the source repository and add structural fixtures for changed behavior.
 3. Run `python3 "$SOURCE_ROOT/scripts/run_checks.py"` and keep evidence claims at E1/E2 unless real prompt replays exist.
-4. Commit only intended source changes, then require a clean source worktree so the installation maps to an exact commit.
-5. Run `python3 "$SOURCE_ROOT/scripts/install.py" --source "$SOURCE_ROOT" --target "$INSTALL_ROOT" --dry-run`; only after success, use `--force` when global installation was explicitly requested.
+4. Commit only when requested. Before an authorized global install, require a clean source worktree mapped to an exact commit; if committing was not authorized, stop after the successful dry-run and request that specific decision.
+5. Run `python3 "$SOURCE_ROOT/scripts/install.py" --source "$SOURCE_ROOT" --target "$INSTALL_ROOT" --dry-run`; only after success, use `--force` when global installation was explicitly requested and the clean-source condition is satisfied.
 6. Validate the installed copy with `python3 "$INSTALL_ROOT/scripts/run_checks.py"`; the installer must preserve the old installation outside the discoverable `skills/` directory.
 7. Push only when requested, then verify the remote branch SHA equals the local commit.
 
@@ -246,4 +259,4 @@ Do not claim completion while required files, checks, installation, or explicitl
 
 ## Quality Standard
 
-A strong result has a clear root and success standard, explicit triggers and non-use cases, a stable decision workflow, reusable output, honest Trust boundaries, proportionate verification, clean handoffs, and an evidence-driven evolution path. Detailed scoring belongs to `references/evaluation-rubric.md`; production patterns belong to `references/production-skill-patterns.md`.
+A strong result has a clear root and success standard, explicit triggers and non-use cases, a stable decision workflow, reusable output, honest Trust boundaries, proportionate verification, clean handoffs, and an evidence-driven evolution path. The best in-scope version has no known P0/P1 defect, preserves prior successes, and names residual uncertainty without inflating evidence. Detailed scoring belongs to `references/evaluation-rubric.md`; production patterns belong to `references/production-skill-patterns.md`.

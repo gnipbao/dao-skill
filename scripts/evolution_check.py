@@ -18,7 +18,7 @@ REQUIRED_FILES = [
 
 REQUIRED_MARKERS = {
     "SKILL.md": [
-        "### 7. 机: Execute The Evolution Machine",
+        "### 6. 机 · Execute The Evolution Machine",
         "CHECKPOINT / STOP",
         "scripts/evolution_check.py",
         "asset action: `create`, `merge`, or `discard`",

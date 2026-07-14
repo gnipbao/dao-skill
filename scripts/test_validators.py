@@ -103,6 +103,46 @@ description: This deliberately long description exists to verify that nested sho
             )
             self.assertTrue(check_skill(root))
 
+    def test_frontmatter_requires_exact_closing_delimiter(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "SKILL.md").write_text(
+                "---\nname: false-close\ndescription: A sufficiently long description for validator coverage.\n---not-a-delimiter\n# Body\n",
+                encoding="utf-8",
+            )
+            self.assertIn("SKILL.md frontmatter is not closed", check_skill(root))
+
+    def test_duplicate_and_extra_frontmatter_fields_are_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            duplicate_root = Path(tmp) / "duplicate"
+            duplicate_root.mkdir()
+            (duplicate_root / "SKILL.md").write_text(
+                "---\nname: duplicate\nname: repeated\ndescription: A sufficiently long description for validator coverage and duplicate detection.\n---\n# Body\n",
+                encoding="utf-8",
+            )
+            self.assertIn("Duplicate frontmatter field: name", check_skill(duplicate_root))
+
+            extra_root = Path(tmp) / "extra"
+            extra_root.mkdir()
+            (extra_root / "SKILL.md").write_text(
+                "---\nname: extra-field\ndescription: A sufficiently long description for validator coverage and extra field detection.\nversion: 1\n---\n# Body\n",
+                encoding="utf-8",
+            )
+            self.assertTrue(
+                any("Unexpected frontmatter field(s): version" in issue for issue in check_skill(extra_root))
+            )
+
+    def test_invalid_hyphen_placement_in_skill_name_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "SKILL.md").write_text(
+                "---\nname: invalid--name\ndescription: A sufficiently long description for validator coverage and invalid name detection.\n---\n# Body\n",
+                encoding="utf-8",
+            )
+            self.assertTrue(
+                any("consecutive hyphens" in issue for issue in check_skill(root))
+            )
+
     @unittest.skipIf(os.name == "nt", "creating symlinks may require Windows developer mode")
     def test_staged_symlink_mode_is_detected(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -124,6 +164,19 @@ description: This deliberately long description exists to verify that nested sho
 #   allow_implicit_invocation: true
 """
         self.assertTrue(repository_check.check_metadata(fake))
+
+    def test_metadata_short_description_length_is_enforced(self) -> None:
+        metadata = """interface:
+  display_name: "Dao"
+  short_description: "Too short"
+  default_prompt: "Use $dao-skill when the user explicitly requests help."
+policy:
+  allow_implicit_invocation: true
+"""
+        self.assertIn(
+            "agents/openai.yaml interface.short_description must be 25-64 characters",
+            repository_check.check_metadata(metadata),
+        )
 
 
 if __name__ == "__main__":

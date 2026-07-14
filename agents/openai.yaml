@@ -1,6 +1,6 @@
 interface:
   display_name: "道 · Skill"
-  short_description: "归根、生成、评估并进化 Agent Skill"
-  default_prompt: "Use $dao-skill to turn this idea, artifact, evidence, or feedback into a rooted, runnable, verifiable Skill. Do not write outside the current project, install globally, commit, or publish unless the user explicitly requests that action."
+  short_description: "归根、生成、评估、优化并进化 Agent Skill"
+  default_prompt: "Use $dao-skill to find the root problem, then design, create, evaluate, optimize, or evolve the smallest verifiable Skill; do not write outside the current project, install globally, commit, or publish unless the user explicitly requests that action."
 policy:
   allow_implicit_invocation: true

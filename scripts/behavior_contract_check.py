@@ -18,6 +18,7 @@ REQUIRED_CASES = {
     "absorb-external-method",
     "mode-c-file-first",
     "compound-evaluate-and-fix",
+    "optimize-existing-skill",
     "no-unneeded-checkpoint",
     "active-installed-source-separate",
     "runtime-generated-child-boundary",
@@ -31,10 +32,29 @@ REQUIRED_CASES = {
 REQUIRED_SKILL_MARKERS = (
     "## Mode Router",
     "### Compound Requests",
+    "## Optimization Contract",
     "explicitly authorized",
     "## Completion Contract",
     "references/runtime-workspace.md",
 )
+
+REQUIRED_CASE_RULES = {
+    "optimize-existing-skill": {
+        "assertions": {
+            "mode:D-then-C",
+            "baseline-before-edit",
+            "preserve-success-invariants",
+            "targeted-retest",
+            "residual-uncertainty",
+        },
+        "forbidden": {
+            "absolute-best-claim",
+            "score-gaming",
+            "feature-bloat",
+            "unrequested-external-action",
+        },
+    }
+}
 
 
 def check(root: Path) -> list[str]:
@@ -82,6 +102,13 @@ def check(root: Path) -> list[str]:
             overlap = set(assertions) & set(forbidden)
             if overlap:
                 issues.append(f"Case {case_id} asserts and forbids the same behavior: {sorted(overlap)}")
+            required = REQUIRED_CASE_RULES.get(case_id, {})
+            for field, actual in (("assertions", set(assertions)), ("forbidden", set(forbidden))):
+                missing_items = required.get(field, set()) - actual
+                if missing_items:
+                    issues.append(
+                        f"Case {case_id} is missing required {field}: {sorted(missing_items)}"
+                    )
 
     for case_id in sorted(REQUIRED_CASES - seen):
         issues.append(f"Missing required behavior case: {case_id}")

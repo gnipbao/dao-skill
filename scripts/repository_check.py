@@ -209,6 +209,9 @@ def check_metadata(text: str) -> list[str]:
     for key in ("display_name", "short_description", "default_prompt"):
         if not isinstance(interface.get(key), str) or not str(interface.get(key)).strip():
             issues.append(f"agents/openai.yaml interface.{key} must be a non-empty string")
+    short_description = interface.get("short_description", "")
+    if isinstance(short_description, str) and not 25 <= len(short_description) <= 64:
+        issues.append("agents/openai.yaml interface.short_description must be 25-64 characters")
     prompt = interface.get("default_prompt", "")
     if isinstance(prompt, str):
         for marker in ("$dao-skill", "explicitly requests"):
