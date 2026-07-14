@@ -122,7 +122,7 @@ Status values:
 - `quarantined`: evidence may matter, but is not trustworthy or broad enough yet
 - `provisional`: only dry-run validation exists
 
-Do not mix rejected evidence into global rules. Keep it in examples, notes, or quarantine until another trace confirms it.
+Do not mix rejected evidence into global rules or quarantine. Keep it only in the audit ledger; use `quarantined` for evidence that remains plausible but is not deployable yet.
 
 ## SkillBank Structure
 
@@ -232,6 +232,11 @@ Use three decisions:
 
 Prefer merge over create when the root problem and trigger are the same.
 
+Keep asset decisions separate from deployment status:
+
+- asset decision: `create`, `merge`, or `discard`
+- deployment status: `accepted`, `provisional`, `quarantined`, or `rejected`
+
 ### 4. Patch Conservatively
 
 Conservative editing rules:
@@ -276,7 +281,7 @@ Choose the validation strength by risk:
 |---|---|---|---|
 | Low: wording, example, small trigger | structure check + retest dry-run | old failure is explicitly handled | accept or mark provisional |
 | Medium: workflow branch, reference protocol, generated skill pattern | structure check + old-vs-new behavior comparison + one regression prompt | new behavior fixes failure and preserves an old success invariant | accept after reporting rollback condition |
-| High: router behavior, safety boundary, SkillBank lifecycle, broad generation policy | structure check + independent judge or full test + old-vs-new + human CHECKPOINT / STOP | at least one external signal agrees and no preserved invariant breaks | deploy only after review |
+| High: router behavior, safety boundary, SkillBank lifecycle, broad generation policy | structure check + independent judge or full test + old-vs-new + human checkpoint when deployment was not already authorized | at least one external signal agrees and no preserved invariant breaks | deploy only after required validation and authorization |
 
 When independent judges or full tests are unavailable, label the update `provisional` and keep the rollback condition visible.
 
@@ -316,7 +321,7 @@ Use this loop when designing a self-evolving skill family or repository.
 7. Decide create/merge/discard.
 8. Patch conservatively.
 9. Validate against old failures and preserved success cases.
-10. Deploy accepted updates, quarantine rejected ones.
+10. Deploy accepted updates, quarantine plausible provisional evidence, and keep rejected evidence only in the audit ledger.
 11. Repeat on the next batch.
 ```
 
@@ -341,12 +346,13 @@ An evolution is deployed only when:
 
 - the changed asset is named
 - the evidence packet is summarized
-- create/merge/discard/quarantine is explicit
+- create/merge/discard asset decision is explicit
+- accepted/provisional/quarantined/rejected deployment status is explicit
 - validation mode is named
 - rollback condition exists
 - the next retest prompt is stored or reported
 
-If broad propagation is requested, stop at CHECKPOINT / STOP before copying the rule into sibling skills.
+If broad propagation was not already explicitly authorized, stop at CHECKPOINT / STOP before copying the rule into sibling skills. Explicit authorization removes duplicate confirmation, not validation or rollback requirements.
 
 ## Output Protocol: Absorption Report
 
@@ -364,6 +370,8 @@ If broad propagation is requested, stop at CHECKPOINT / STOP before copying the 
 新增：
 合并：
 丢弃：
+资产决策：create / merge / discard
+部署状态：accepted / provisional / quarantined / rejected
 
 ### 已落地更新
 文件：

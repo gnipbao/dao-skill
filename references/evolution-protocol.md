@@ -22,15 +22,17 @@ An evolution run is valid only when it produces all five artifacts below:
 
 1. Evidence packet: what happened, where it happened, and what signal proves it matters.
 2. Asset retrieval: the nearest existing rule, reference, example, script, child skill, or rubric item.
-3. Patch decision: `create`, `merge`, `discard`, or `quarantine`.
+3. Asset decision: `create`, `merge`, or `discard`.
 4. Retest prompt: a prompt or fixture that exposes the old failure.
-5. Validation and rollback: the pass/fail signal, preserved invariants, and rollback or quarantine condition.
+5. Validation and deployment: pass/fail signal, preserved invariants, deployment status (`accepted`, `provisional`, `quarantined`, or `rejected`), and rollback or quarantine condition.
 
 If any artifact is missing, label the run `provisional` and do not claim that dao-skill has learned.
 
 ## CHECKPOINT / STOP Gates
 
-Stop for human review before editing or deploying when:
+Explicit authorization already granted for the named repository, installation, or deployment scope does not require a second confirmation. Local reversible patching and retesting may proceed within that scope.
+
+Stop for human review before an unauthorized deployment or scope expansion when:
 
 - the evidence is weak but the patch would affect many future generated skills
 - the patch changes trigger routing, safety boundaries, or output schemas
@@ -49,7 +51,7 @@ The user should not need to memorize a feedback template. If feedback is vague, 
 When the user says things like "不好用", "不对", "太泛", "没有解决", or "这不是我要的":
 
 1. Restate the suspected mismatch in one sentence.
-2. Ask at most three short questions.
+2. Ask at most two short questions.
 3. Ask only for information that changes the root diagnosis.
 4. Use the user's answers to fill the evolution fields yourself.
 5. If the user does not answer every question, proceed with a provisional diagnosis and mark uncertainty.
@@ -57,11 +59,10 @@ When the user says things like "不好用", "不对", "太泛", "没有解决", 
 Default question set:
 
 ```md
-我先帮你把反馈变成可进化证据。你简单回答这 3 个就行：
+我先帮你把反馈变成可进化证据。你简单回答这 2 个就行：
 
-1. 哪个 skill 或输出不好用？
-2. 它实际做了什么，让你卡住？
-3. 你希望它下次怎么做才算好用？
+1. 哪个 skill 或输出不好用，它实际哪里让你卡住？
+2. 你希望它下次怎么做才算好用？
 ```
 
 If the user already gave the failed object, ask only:
@@ -136,12 +137,13 @@ Before writing anything, locate the nearest existing home for the learning:
 最近已有资产：
 相似原因：
 差异：
-决策：create / merge / discard / quarantine
+资产决策：create / merge / discard
+部署状态：accepted / provisional / quarantined / rejected
 为什么不是新建：
 为什么不是只改当前 child skill：
 ```
 
-Use `create` only when no existing asset owns the trigger, root problem, or behavior. Use `quarantine` when the evidence may matter later but is not trustworthy enough to become a rule.
+Use `create` only when no existing asset owns the trigger, root problem, or behavior. Use deployment status `quarantined` when the evidence may matter later but is not trustworthy enough to become an active rule.
 
 ### 5. Convert Learning Into A Patch
 
@@ -215,6 +217,8 @@ v1 学到什么：
 v2 学到什么：
 dao-skill 自身缺口：
 新增规则：
+资产决策：create / merge / discard
+部署状态：accepted / provisional / quarantined / rejected
 文件更新计划：
 验证方式：
 回滚条件：

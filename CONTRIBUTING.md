@@ -22,10 +22,7 @@ If a child Skill reveals a reusable lesson, reduce it to the smallest routing ru
 3. Run:
 
 ```bash
-python3 scripts/quality_check.py .
-python3 scripts/evolution_check.py .
-python3 scripts/evaluation_check.py .
-python3 scripts/repository_check.py .
+python3 scripts/run_checks.py
 ```
 
 4. In the pull request, state the evidence, pass signal, and rollback condition.
@@ -36,3 +33,4 @@ python3 scripts/repository_check.py .
 - Label source boundaries and uncertainty.
 - Prefer standard-library validation scripts with deterministic exit codes.
 - Do not claim public links, marketplace entries, benchmarks, or runtime support that have not been verified.
+- Treat static behavior contracts as E1 evidence; attach replay artifacts before claiming runtime verification.

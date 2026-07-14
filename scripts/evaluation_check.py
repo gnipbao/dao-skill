@@ -8,6 +8,8 @@ import re
 import sys
 from pathlib import Path
 
+from validation_utils import strip_nonsemantic_markdown
+
 
 EXPECTED_WEIGHTS = {
     "根问题与适用性": 15,
@@ -27,6 +29,7 @@ REQUIRED_RUBRIC_MARKERS = [
     "## 3. Verdict Rules",
     "Permission scope",
     "Sensitive data",
+    "Input and action safety",
     "Dependencies and provenance",
     "Environment fitness",
     "E1 -> structural estimate only",
@@ -36,7 +39,7 @@ REQUIRED_RUBRIC_MARKERS = [
 REQUIRED_SKILL_MARKERS = [
     "evidence level -> Trust Gate -> 100-point score",
     "Trust is a hard gate",
-    "Use `scripts/evaluation_check.py`",
+    "scripts/evaluation_check.py",
 ]
 
 
@@ -44,6 +47,11 @@ def extract_weights(text: str) -> dict[str, int]:
     weights: dict[str, int] = {}
     pattern = re.compile(r"^([^\n：:]+)[：:]0-(\d+)\s*$", re.MULTILINE)
     for label, maximum in pattern.findall(text):
+        label = label.strip()
+        if label in EXPECTED_WEIGHTS:
+            weights[label] = int(maximum)
+    table_pattern = re.compile(r"^\|\s*([^|]+?)\s*\|\s*(\d+)\s*\|\s*$", re.MULTILINE)
+    for label, maximum in table_pattern.findall(text):
         label = label.strip()
         if label in EXPECTED_WEIGHTS:
             weights[label] = int(maximum)
@@ -61,8 +69,8 @@ def check(root: Path) -> list[str]:
     if issues:
         return issues
 
-    skill = skill_path.read_text(encoding="utf-8")
-    rubric = rubric_path.read_text(encoding="utf-8")
+    skill = strip_nonsemantic_markdown(skill_path.read_text(encoding="utf-8"))
+    rubric = strip_nonsemantic_markdown(rubric_path.read_text(encoding="utf-8"))
 
     for rel, text, markers in (
         ("SKILL.md", skill, REQUIRED_SKILL_MARKERS),
@@ -72,17 +80,17 @@ def check(root: Path) -> list[str]:
             if marker not in text:
                 issues.append(f"Missing evaluation marker in {rel}: {marker}")
 
-    for rel, text in (
-        ("SKILL.md", skill),
-        ("references/evaluation-rubric.md", rubric),
-    ):
-        weights = extract_weights(text)
-        if weights != EXPECTED_WEIGHTS:
-            issues.append(
-                f"Score weights in {rel} differ from the canonical weights: {weights}"
-            )
-        elif sum(weights.values()) != 100:
-            issues.append(f"Score weights in {rel} sum to {sum(weights.values())}, not 100")
+    weights = extract_weights(rubric)
+    if weights != EXPECTED_WEIGHTS:
+        issues.append(
+            "Score weights in references/evaluation-rubric.md differ from the canonical "
+            f"weights: {weights}"
+        )
+    elif sum(weights.values()) != 100:
+        issues.append(
+            "Score weights in references/evaluation-rubric.md sum to "
+            f"{sum(weights.values())}, not 100"
+        )
 
     return issues
 

@@ -3,7 +3,9 @@
 User:
 
 ```md
-研究这篇文章，然后吸收到 dao-skill 的体系里，变成一个可以自主进化的系统。
+研究下面这段用户提供的文章摘要，然后吸收到 dao-skill 的体系里，变成一个可以自主进化的系统。
+
+摘要：文章比较了 SkillRL、AutoSkill、MemSkill 与 SkillClaw，认为执行经验应被压缩成可检索、可合并、可版本化的 Skill，并在部署前通过失败回放和回滚门禁。这里只提供摘要，没有提供论文原文或完整仓库实现。
 ```
 
 Expected dao-skill behavior:
@@ -30,7 +32,12 @@ Expected dao-skill behavior:
 - references/evolution-protocol.md
 
 验证方式：
-- scripts/quality_check.py
+- python3 scripts/quality_check.py . --profile dao
+- python3 scripts/evolution_check.py .
+- 用下一条反测做 dry-run，并明确其证据仅为 E2 provisional
+
+回滚条件：
+- 新规则导致每次反馈都新增 Skill、绕过 nearest-asset retrieval，或在无验证时自动部署时，回滚本次规则并将证据标记为 quarantined。
 
 下一轮反测：
 让 dao-skill 处理一篇新的外部方法文章，检查它是否更新规则/参考/反测，而不是只写摘要。

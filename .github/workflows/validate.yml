@@ -9,13 +9,24 @@ permissions:
 
 jobs:
   checks:
-    runs-on: ubuntu-latest
+    name: ${{ matrix.os }} / Python ${{ matrix.python }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            python: "3.9"
+          - os: ubuntu-latest
+            python: "3.13"
+          - os: macos-latest
+            python: "3.13"
+          - os: windows-latest
+            python: "3.13"
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
-          python-version: "3.12"
-      - run: python3 scripts/quality_check.py .
-      - run: python3 scripts/evolution_check.py .
-      - run: python3 scripts/evaluation_check.py .
-      - run: python3 scripts/repository_check.py .
+          python-version: ${{ matrix.python }}
+      - run: python scripts/run_checks.py

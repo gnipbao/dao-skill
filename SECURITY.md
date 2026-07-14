@@ -4,7 +4,9 @@
 
 ## Report A Vulnerability
 
-Use a private GitHub security advisory after the repository is published. Do not include secrets, personal data, or exploit payloads in a public issue.
+Use GitHub private vulnerability reporting when it is enabled for the repository. If that option is unavailable, open a public issue containing no exploit details or sensitive data and ask the maintainer to establish a private channel. Never paste credentials, private corpora, personal data, or working exploit payloads into a public issue.
+
+Until versioned releases exist, security fixes target the latest commit on `main`; older commits are not maintained as supported release lines.
 
 ## User Guidance
 
@@ -20,3 +22,4 @@ Use a private GitHub security advisory after the repository is published. Do not
 - Never commit `.env` files, credentials, cookies, private keys, raw personal traces, or machine-specific absolute paths.
 - Do not silently broaden filesystem, network, account, or shell permissions.
 - Treat a readable static review as evidence, not proof that generated code is safe.
+- Keep installer staging and backups outside discoverable Skill directories, reject unsafe targets, and validate staging before replacing an installation.

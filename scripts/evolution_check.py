@@ -7,6 +7,8 @@ import argparse
 import sys
 from pathlib import Path
 
+from validation_utils import strip_nonsemantic_markdown
+
 
 REQUIRED_FILES = [
     "SKILL.md",
@@ -16,10 +18,11 @@ REQUIRED_FILES = [
 
 REQUIRED_MARKERS = {
     "SKILL.md": [
-        "### 7. 机: Execute The Evolution Machine",
+        "### 6. 机 · Execute The Evolution Machine",
         "CHECKPOINT / STOP",
         "scripts/evolution_check.py",
-        "create`, `merge`, `discard`, or `quarantine",
+        "asset action: `create`, `merge`, or `discard`",
+        "deployment status (`accepted`, `provisional`, `quarantined`, or `rejected`)",
         "回滚或隔离条件",
     ],
     "references/evolution-protocol.md": [
@@ -55,7 +58,7 @@ def check_markers(root: Path) -> list[str]:
         path = root / rel
         if not path.is_file():
             continue
-        text = path.read_text(encoding="utf-8")
+        text = strip_nonsemantic_markdown(path.read_text(encoding="utf-8"))
         for marker in markers:
             if marker not in text:
                 issues.append(f"Missing marker in {rel}: {marker}")
