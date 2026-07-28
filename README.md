@@ -15,6 +15,10 @@
   <img alt="Python 3.9+" src="https://img.shields.io/badge/Python-3.9%2B-334155.svg" />
 </p>
 
+## 15 秒看懂道 · Skill
+
+https://github.com/user-attachments/assets/6fffc9a3-e69f-41ab-9347-7ec9e0a0866a
+
 ---
 
 `dao-skill` 是一个 Skill 元设计器。它不直接扮演所有业务专家，而是帮你找到真正的问题、选择正确的 Skill 形态、生成具体产物，并用证据持续改进。
