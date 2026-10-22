@@ -12,7 +12,7 @@ from pathlib import Path
 import evaluation_check
 import evolution_check
 import repository_check
-from quality_check import check_skill, engine_nesting
+from quality_check import catalog_selection_warning, check_skill, engine_nesting
 
 
 class ValidatorRegressionTests(unittest.TestCase):
@@ -79,6 +79,10 @@ description: This is a deliberately long trigger description used only to valida
             self.assertEqual(by_origin["index"], staged_secret)
             self.assertEqual(by_origin["worktree"], "clean worktree")
 
+    @unittest.skipUnless(
+        (Path(__file__).resolve().parents[1] / ".gitignore").is_file(),
+        "installed packages do not ship .gitignore",
+    )
     def test_gitignore_allowlist_keeps_workspace_out_of_publication(self) -> None:
         gitignore = (Path(__file__).resolve().parents[1] / ".gitignore").read_text(encoding="utf-8")
         public = repository_check.ALLOWED_ROOT_FILES | {
@@ -123,6 +127,17 @@ description: This is a deliberately long trigger description used only to valida
                 self.assertEqual(result[0], expected)
                 self.assertIsNone(engine_nesting(engine.resolve()))
             self.assertIsNone(engine_nesting(Path(tmp).resolve() / "outside" / "child-skill"))
+
+    def test_formula_catalog_without_selection_rule_is_warned(self) -> None:
+        catalog = "".join(f"{n}. 公式 {n}：「XX 模板 {n}」\n" for n in range(1, 21))
+        dump = f"## 工作流程\n\n1. 套用下面全部 20 个公式。\n\n## 标题公式\n\n{catalog}"
+        self.assertIsNotNone(catalog_selection_warning(dump))
+        selected = dump.replace("套用下面全部 20 个公式", "先诊断内容，再按适用信号选用 2-4 个公式")
+        self.assertIsNone(catalog_selection_warning(selected))
+        fenced = f"## 标题公式\n\n{catalog}```md\n适用信号\n```\n"
+        self.assertIsNotNone(catalog_selection_warning(fenced))
+        short = "## 模板\n\n1. a\n2. b\n3. c\n"
+        self.assertIsNone(catalog_selection_warning(short))
 
     def test_fake_png_is_rejected(self) -> None:
         self.assertTrue(repository_check.check_png(b"not a png", "assets/dao-skill-banner.png"))

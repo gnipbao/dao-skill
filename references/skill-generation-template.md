@@ -148,6 +148,7 @@ description: Creates and evaluates X by doing Y. Use when the user asks for A, B
 - Tool-coupled skills name the actual tool path and required settings instead of implying a generic workflow.
 - Image skills lock platform-critical aspect ratios in the workflow, prompt template, and QA checklist.
 - Content-derived image skills explicitly decide asset count and source coverage; long-form inputs cannot silently collapse into one overview image.
+- Formula-, template-, or catalog-driven skills (title formulas, hooks, copy frameworks, prompt templates) diagnose the input before touching the catalog. Each entry carries fit signals and exclusion conditions, the workflow selects a small reasoned subset, and every output traces to a fact in the input. Example words inside an entry are slots to fill from the input, never content. Applying every entry and letting the user pick is a template dump, not a selection rule. `scripts/quality_check.py` warns on a long catalog with no selection rule.
 - The production pattern matches the real task.
 - The verification loop is explicit enough to catch drift.
 - Source-reconstruction skills need an explicit binding from inspected evidence to canonical facts to delivered outputs. When several formats describe the same source, generate or check them against the same facts; do not treat format validity as fidelity.

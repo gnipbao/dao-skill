@@ -30,6 +30,13 @@ def main() -> int:
         )
     else:
         print("Installed-package mode: skipping Git repository and installer self-tests.")
+        commands.insert(
+            0,
+            (
+                "install receipt",
+                [sys.executable, "scripts/install.py", "--verify", "--target", "."],
+            ),
+        )
     env = {**os.environ, "PYTHONDONTWRITEBYTECODE": "1"}
 
     for label, command in commands:
