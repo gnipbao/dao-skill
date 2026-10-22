@@ -209,6 +209,39 @@ def check_skill(path: Path, profile: str = "generic") -> list[str]:
     return issues
 
 
+def dao_skill_ancestor(path: Path) -> Path | None:
+    for parent in path.parents:
+        skill_md = parent / "SKILL.md"
+        if not skill_md.is_file():
+            continue
+        try:
+            frontmatter, _ = parse_frontmatter(skill_md.read_text(encoding="utf-8"))
+        except (OSError, UnicodeDecodeError, ValueError):
+            continue
+        if frontmatter.get("name") == "dao-skill":
+            return parent
+    return None
+
+
+def engine_nesting(path: Path) -> tuple[str, str] | None:
+    """Classify a child Skill target that sits inside a dao-skill engine."""
+
+    engine = dao_skill_ancestor(path)
+    if engine is None:
+        return None
+    if (engine / ".git").exists():
+        return (
+            "warning",
+            f"Target is inside the dao-skill source {engine}; it stays unpublished local "
+            "workspace. Prefer $DAO_SKILL_HOME/skills/<name>/ or a sibling of the source.",
+        )
+    return (
+        "error",
+        f"Target is inside the installed dao-skill {engine}; the next install replaces it. "
+        "Move it to <project>/.dao/skills/<name>/ or $DAO_SKILL_HOME/skills/<name>/.",
+    )
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Check a Codex skill folder.")
     parser.add_argument("path", nargs="?", default=".", help="Path to skill folder")
@@ -222,6 +255,13 @@ def main() -> int:
 
     path = Path(args.path).resolve()
     issues = check_skill(path, args.profile)
+    nesting = engine_nesting(path)
+    if nesting is not None:
+        level, message = nesting
+        if level == "error":
+            issues.append(message)
+        else:
+            print(f"Warning: {message}")
     if issues:
         print("Quality check failed:")
         for issue in issues:

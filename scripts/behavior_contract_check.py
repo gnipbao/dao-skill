@@ -22,6 +22,7 @@ REQUIRED_CASES = {
     "no-unneeded-checkpoint",
     "active-installed-source-separate",
     "runtime-generated-child-boundary",
+    "child-target-when-cwd-is-dao-source",
     "trust-gate-overrides-score",
     "structural-score-is-not-runtime-proof",
     "public-ready-skill-repo",

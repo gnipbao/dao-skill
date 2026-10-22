@@ -13,6 +13,8 @@ Do not submit:
 - output files, screenshots, caches, or local backups
 - private corpora, credentials, cookies, or machine-specific paths
 
+`.gitignore` is an allowlist of the public payload. A new public file must be allowed both there and in `scripts/repository_check.py`; `scripts/run_checks.py` fails when the two drift.
+
 If a child Skill reveals a reusable lesson, reduce it to the smallest routing rule, reference mechanism, test prompt, or validator change that belongs in dao-skill.
 
 ## Development Loop

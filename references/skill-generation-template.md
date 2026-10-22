@@ -105,8 +105,11 @@ For image-generation skills, explicitly separate:
 
 - direct generation mode: which image tool/model to call, with required settings
 - prompt-only mode: when to stop at a reusable prompt
+- asset multiplicity: whether the default result is one hero image, several variants, or a section-mapped pack; for source-derived long-form content, define a deterministic coverage/density rule before writing prompts
 - platform constraints: fixed aspect ratio, safe areas, text policy, and regeneration rules
 - forbidden detours: scripts, renderers, or post-processing steps that are not needed for the user's requested tool
+
+For article-, document-, lesson-, or script-derived image skills, never infer “one source equals one image.” Segment the source first, declare short/medium/long defaults, map each planned asset to a source unit, cap the default pack, and define one independent tool call and QA record per distinct asset. A visually strong overview image does not pass when the user's real job is inline coverage across a long source.
 
 ## Boundaries
 
@@ -144,5 +147,9 @@ description: Creates and evaluates X by doing Y. Use when the user asks for A, B
 - The output is copyable or actionable.
 - Tool-coupled skills name the actual tool path and required settings instead of implying a generic workflow.
 - Image skills lock platform-critical aspect ratios in the workflow, prompt template, and QA checklist.
+- Content-derived image skills explicitly decide asset count and source coverage; long-form inputs cannot silently collapse into one overview image.
 - The production pattern matches the real task.
 - The verification loop is explicit enough to catch drift.
+- Source-reconstruction skills need an explicit binding from inspected evidence to canonical facts to delivered outputs. When several formats describe the same source, generate or check them against the same facts; do not treat format validity as fidelity.
+- For interpretation-sensitive reconstruction, or when the user requests review before output, define a lightweight human-facing interpretation checkpoint before production: summarize observable content, causal or expressive meaning, unresolved choices, and the intended target. Distinguish factual evidence from user-selected meaning; confirmation cannot turn an inference into an observation. Reuse current confirmation for presentation-only edits, invalidate it for a new source or changed meaning, honor an explicit waiver, and never treat silence or a format request as confirmation. Do not add this checkpoint indiscriminately to unrelated Skills.
+- For evidence-sensitive outputs, include one mutation retest: change a delivered claim without updating evidence, then change a canonical fact after review. Specify what rejects the first change and invalidates the earlier review for the second. A review declaration or file hash does not itself prove semantic truth.
