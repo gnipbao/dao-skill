@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Install dao-skill into a user-owned Codex skill directory safely."""
+"""Install dao-skill into a user-owned agent skill directory safely."""
 
 from __future__ import annotations
 
@@ -350,7 +350,7 @@ def main() -> int:
                 print(f"Restored backup to {target}")
                 if current_backup is not None:
                     print(f"Replaced installation preserved at {current_backup}")
-                print("Start a new Codex thread to reload the skill catalog.")
+                print("Start a new Codex or Claude Code session to reload the skill catalog.")
             return 0
 
         files, backup = install_payload(
@@ -376,7 +376,7 @@ def main() -> int:
     print(f"Installed {len(files)} files to {target}")
     if backup is not None:
         print(f"Previous installation preserved at {backup}")
-    print("Start a new Codex thread to reload the skill catalog.")
+    print("Start a new Codex or Claude Code session to reload the skill catalog.")
     return 0
 
 

@@ -15,6 +15,10 @@
   <img alt="Python 3.9+" src="https://img.shields.io/badge/Python-3.9%2B-334155.svg" />
 </p>
 
+## 15 秒看懂道 · Skill
+
+https://github.com/user-attachments/assets/6fffc9a3-e69f-41ab-9347-7ec9e0a0866a
+
 ---
 
 `dao-skill` 是一个 Skill 元设计器。它不直接扮演所有业务专家，而是帮你找到真正的问题、选择正确的 Skill 形态、生成具体产物，并用证据持续改进。
@@ -89,7 +93,7 @@ python3 scripts/install.py --restore-backup /path/from/installer/output --dry-ru
 python3 scripts/install.py --restore-backup /path/from/installer/output
 ```
 
-自定义安装位置必须在安装、更新和回滚时重复传入同一个 `--target`；可用 `--state-dir` 把暂存与备份固定到另一个非 Skill 扫描目录。安装或更新后，新建 Codex 会话，让 Skill 列表重新加载。
+自定义安装位置必须在安装、更新和回滚时重复传入同一个 `--target`；可用 `--state-dir` 把暂存与备份固定到另一个非 Skill 扫描目录。安装或更新后，新建 Codex 或 Claude Code 会话，让 Skill 列表重新加载。
 
 ```bash
 python3 scripts/install.py \
@@ -98,11 +102,18 @@ python3 scripts/install.py \
   --dry-run
 ```
 
+Claude Code 从 `~/.claude/skills/` 发现 Skill，安装、更新和回滚时都传入同一个 `--target`；暂存与备份默认放在 `~/.claude/.dao-skill-state/`，不会被当作 Skill 扫描：
+
+```bash
+python3 scripts/install.py --target ~/.claude/skills/dao-skill --dry-run
+python3 scripts/install.py --target ~/.claude/skills/dao-skill
+```
+
 `main` 会持续演进；需要完全可复现的安装时，请在安装前检出一个已验证的 tag 或 commit SHA。
 
 ## 第一次调用
 
-从一个模糊想法开始：
+Codex 中用 `$dao-skill` 调用，Claude Code 中用 `/dao-skill`。从一个模糊想法开始：
 
 ```text
 使用 $dao-skill：我想做一个帮创业者判断产品方向的 skill，先帮我归根。
@@ -142,9 +153,13 @@ python3 scripts/install.py \
 
 1. 用户明确指定的可写目录。
 2. 当前项目的 `.dao/skills/<skill-name>/`，适合项目内草稿。
-3. 用户明确要求直接安装时，写入 `${CODEX_HOME:-$HOME/.codex}/skills/<skill-name>/`。
+3. 用户明确要求直接安装时，写入当前宿主的用户 Skill 目录：Codex 为 `${CODEX_HOME:-$HOME/.codex}/skills/<skill-name>/`，Claude Code 为 `~/.claude/skills/<skill-name>/`。
+
+如果会话就开在 dao-skill 源码仓库里，它会被识别为引擎而不是用户项目：新子 Skill 写到 `$DAO_SKILL_HOME/skills/<skill-name>/`，或写前声明的源码同级目录，不会落在仓库根目录或 `examples/` 下。
 
 SkillBank 和进化状态默认放在项目 `.dao/`，也可通过 `DAO_SKILL_HOME` 指向仓库外的用户数据目录。完整规则见 [`references/runtime-workspace.md`](references/runtime-workspace.md)。
+
+源码仓库的 `.gitignore` 是公开载荷白名单：工作区里的子 Skill、输出和草稿默认不进入 Git，无需逐个目录忽略。
 
 ## 仓库结构
 

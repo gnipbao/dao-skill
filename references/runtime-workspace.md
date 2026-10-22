@@ -19,16 +19,19 @@ First classify the target:
 
 Resolve `<project>` in this order: an explicit user path; the nearest ancestor of the current working directory containing `.git` or a recognized project marker; otherwise the current working directory. State when the fallback is used.
 
+If `<project>` resolves to the dao-skill source repository or an installed dao-skill, it is the engine, not a user project. This is the normal case for a maintainer working from the dao-skill checkout; skip rule 2 below.
+
 Resolve the destination before creating files. Use the first applicable rule:
 
-1. **Explicit user path**: use a writable path supplied by the user.
+1. **Explicit user path**: use a writable path supplied by the user. Honor a path inside the dao-skill source only as unpublished local workspace and say so before writing; the allowlist `.gitignore` keeps it out of Git. Refuse a path inside an installed dao-skill, because the next install replaces it.
 2. **Project-local draft**: use `<project>/.dao/skills/<skill-name>/` when the user wants the artifact in the current project.
-3. **Installed user skill**: use `${CODEX_HOME:-$HOME/.codex}/skills/<skill-name>/` only when the user asks to install or make the skill globally discoverable.
-4. **No writable destination**: do not pretend files were created. Return the proposed tree and the exact path or permission needed.
+3. **Maintainer workspace**: when rule 2 was skipped, use `$DAO_SKILL_HOME/skills/<skill-name>/` if set; otherwise propose `<parent-of-source>/<skill-name>/`, a sibling of the source repository, and state it before the first write.
+4. **Installed user skill**: use the active host's user skill directory only when the user asks to install or make the skill globally discoverable: `${CODEX_HOME:-$HOME/.codex}/skills/<skill-name>/` for Codex, `$HOME/.claude/skills/<skill-name>/` for Claude Code. Ask when the host is unknown.
+5. **No writable destination**: do not pretend files were created. Return the proposed tree and the exact path or permission needed.
 
-Never choose the `dao-skill` source or installation directory as the implicit parent of a child skill.
+Never choose the `dao-skill` source or installation directory as the implicit parent of a child skill. The source `examples/` directory holds flat `*.md` behavior examples, never child Skill folders.
 
-Canonicalize source and target paths before writing. Reject a target that is a symlink, resolves inside the dao-skill source/installation, or is an ancestor of the source. Inspect an existing target before replacement and keep backups outside any discoverable `skills/` directory.
+Canonicalize source and target paths before writing. Reject a target that is a symlink, resolves inside an installed dao-skill, resolves inside the dao-skill source without an explicit user path, or is an ancestor of the source. Inspect an existing target before replacement and keep backups outside any discoverable `skills/` directory. After writing, `scripts/quality_check.py` fails a target inside an installed dao-skill and warns for one inside the source.
 
 ## Dao-Skill Self Update
 
@@ -69,7 +72,7 @@ For global state, recommend a user-owned path outside the installed package, suc
 
 ## Version-Control Boundary
 
-The dao-skill public repository ignores `.dao/`, `skill-bank/`, `generated-skills/`, outputs, caches, complete child repositories, and nested example projects.
+The dao-skill public repository uses an allowlist `.gitignore`: only the public payload checked by `scripts/repository_check.py` is visible to Git. `.dao/`, SkillBank data, outputs, caches, complete child repositories, and nested example projects stay local without per-directory ignore entries. A new public file must be added to both allowlists.
 
 Users may independently version a generated child skill in its own repository. Dao-skill must not initialize, commit, publish, or push that repository unless the user explicitly asks for those actions.
 

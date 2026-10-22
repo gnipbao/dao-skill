@@ -40,7 +40,7 @@ Define three distinct roots:
 
 - `ENGINE_ROOT`: real directory containing the active `SKILL.md`; this is often the installed read-mostly helper package.
 - `SOURCE_ROOT`: an explicit user path or verified dao-skill Git root containing root `SKILL.md`; never infer it from `ENGINE_ROOT` alone.
-- `INSTALL_ROOT`: `${CODEX_HOME:-$HOME/.codex}/skills/dao-skill` unless the user explicitly selects another target.
+- `INSTALL_ROOT`: the active host's user skill directory, `${CODEX_HOME:-$HOME/.codex}/skills/dao-skill` for Codex or `$HOME/.claude/skills/dao-skill` for Claude Code, unless the user explicitly selects another target. Pass any non-default root to the installer as `--target`.
 
 Never assume the current working directory or active installation is the source repository. For a generated Skill run `python3 "$ENGINE_ROOT/scripts/quality_check.py" "$TARGET"`.
 
@@ -145,6 +145,18 @@ For file-producing work:
 5. Run deterministic checks, then the strongest practical behavior check.
 6. Report paths, evidence level, validation, unperformed external actions, and rollback.
 
+### 6. 机 · Execute The Evolution Machine
+
+When a local repository or SkillBank must actually evolve:
+
+1. Build the evidence packet and classify risk.
+2. Retrieve the nearest existing rule, reference, example, script, or child Skill.
+3. Decide the asset action: `create`, `merge`, or `discard`; prefer merge for the same root and trigger.
+4. Patch the smallest asset that changes future behavior.
+5. Run one structural check and one behavior check; use old-vs-new or an independent judge when available.
+6. Record preserved invariants, deployment status (`accepted`, `provisional`, `quarantined`, or `rejected`), and 回滚或隔离条件.
+7. Use `CHECKPOINT / STOP` before high-risk propagation that was not already explicitly authorized.
+
 Keep the visible 道/一/二/三/器 analysis to three to five lines unless the user asked for the reasoning.
 
 ## Mode Contracts
@@ -167,36 +179,20 @@ Read `references/evaluation-rubric.md` and evaluate in this order:
 
 The required sequence is evidence level -> Trust Gate -> 100-point score -> evidence confidence -> constrained verdict -> P0/P1/P2 fixes.
 
-```txt
-evidence level -> Trust Gate -> 100-point score -> evidence confidence -> constrained verdict -> P0/P1/P2 fixes
-```
-
 Trust is a hard gate. E1 structural review cannot certify runtime reliability or effectiveness. If the user also requested fixes, patch only after the evidence-backed diagnosis and then re-run relevant checks.
 
 ### Mode E · 返观进化
 
-Read `references/evolution-protocol.md`. Build the evidence packet, reopen the root, retrieve the nearest existing asset, choose asset decision create/merge/discard, set deployment status accepted/provisional/quarantined/rejected, patch conservatively, and retest the old failure while preserving known successes. Vague feedback may drive a provisional patch, not a benchmark claim.
+Read `references/evolution-protocol.md`. Build the evidence packet from the failure and reopen the root, then run step 6 (机) and retest the old failure while preserving known successes. Vague feedback may drive a provisional patch, not a benchmark claim.
 
 ### Mode F · 自化吸收
 
-Read `references/self-evolving-skill-system.md`. Extract portable mechanisms rather than wording or unsupported claims. Record the source boundary, compare the nearest rule, choose the asset decision create/merge/discard, set deployment status accepted/provisional/quarantined/rejected, patch the smallest durable asset, validate, and define rollback.
-
-### 6. 机 · Execute The Evolution Machine
-
-When a local repository or SkillBank must actually evolve:
-
-1. Build the evidence packet and classify risk.
-2. Retrieve the nearest existing rule, reference, example, script, or child Skill.
-3. Decide the asset action: `create`, `merge`, or `discard`; prefer merge for the same root and trigger.
-4. Patch the smallest asset that changes future behavior.
-5. Run one structural check and one behavior check; use old-vs-new or an independent judge when available.
-6. Record preserved invariants, deployment status (`accepted`, `provisional`, `quarantined`, or `rejected`), and 回滚或隔离条件.
-7. Use `CHECKPOINT / STOP` before high-risk propagation that was not already explicitly authorized.
+Read `references/self-evolving-skill-system.md`. Record the source boundary and extract portable mechanisms rather than wording or unsupported claims, then run step 6 (机) to land the smallest durable asset with validation and rollback.
 
 ## Runtime And Publication Contract
 
-- Prefer an explicit output path, then project-local `.dao/skills/<skill-name>/`.
-- Use `${CODEX_HOME:-$HOME/.codex}/skills/<skill-name>/` only when the user asks for global installation or discovery.
+- Prefer an explicit output path, then project-local `.dao/skills/<skill-name>/`. When the resolved project is the dao-skill source or installation, skip that default and use `$DAO_SKILL_HOME/skills/<skill-name>/` or a sibling of the source stated before the first write.
+- Use the active host's user skill directory (`${CODEX_HOME:-$HOME/.codex}/skills/` or `$HOME/.claude/skills/`) only when the user asks for global installation or discovery.
 - Never use the dao-skill source or installation directory as the implicit parent of a child Skill.
 - Keep SkillBank state, traces, ledgers, quarantine data, and generated output under `DAO_SKILL_HOME` or project `.dao/`.
 - Inspect before overwriting. Preserve a rollback point for an existing installation.
@@ -215,7 +211,7 @@ When the target is dao-skill itself, classify the active paths as source reposit
 6. Validate the installed copy with `python3 "$INSTALL_ROOT/scripts/run_checks.py"`; the installer must preserve the old installation outside the discoverable `skills/` directory.
 7. Push only when requested, then verify the remote branch SHA equals the local commit.
 
-Do not replace this flow with `cp -R`, edit the global copy by hand, or leave a backup containing `SKILL.md` under `${CODEX_HOME}/skills/`.
+Do not replace this flow with `cp -R`, edit the global copy by hand, or leave a backup containing `SKILL.md` under any host's `skills/` directory.
 
 ## Failure Branches
 

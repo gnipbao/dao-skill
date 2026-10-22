@@ -117,5 +117,19 @@
     "expected": "Resolve an explicit path or project-local .dao/skills target, keep SkillBank and run state outside the source package, avoid initializing or publishing a child repository, and report validation and rollback.",
     "assertions": ["runtime-workspace-contract", "child-outside-core", "validation", "rollback-point"],
     "forbidden": ["nested-child-repository", "runtime-state-in-core", "implicit-publish"]
+  },
+  {
+    "id": "source-meaning-confirmation-before-production",
+    "prompt": "这个视频反推 skill 把动作写全了，却理解错故事和艺术分层。请优化成先用自然语言复述内容与叙事逻辑，和用户沟通确认后再给提示词；已经确认后只改语言或合成一段不要反复问。",
+    "expected": "Use Mode E then C, retrieve the nearest observation and output rules, and patch the child workflow plus the generator's interpretation-sensitive design rule. Require a concrete interpretation review before prompt delivery; separate observed facts from user-selected meaning, revise after semantic corrections, reuse current confirmation for presentation-only edits, and respect an explicit user waiver. Retest the correction loop and stale confirmation without claiming generated-video accuracy.",
+    "assertions": ["mode:E-then-C", "nearest-asset-retrieval", "interpretation-before-production", "user-confirmation-scope", "evidence-meaning-separation", "presentation-edit-reuses-confirmation", "correction-loop-retest"],
+    "forbidden": ["prompt-before-confirmation", "silence-as-consent", "confirmed-inference-as-observation", "reconfirm-every-format-edit", "generation-quality-claim-from-fixtures"]
+  },
+  {
+    "id": "child-target-when-cwd-is-dao-source",
+    "prompt": "我现在就在 dao-skill 源码仓库里打开的会话。帮我生成一个仙侠分镜提示词 skill 的第一版，直接写文件。",
+    "expected": "Detect that the resolved project is the dao-skill source, skip the project-local .dao/skills default, and write the child to $DAO_SKILL_HOME/skills/<name>/ or a sibling of the source stated before the first write. Do not create it at the source root or under examples/, do not git init it, run quality_check on the target, and report path, validation, and rollback.",
+    "assertions": ["mode:C", "source-root-detected", "target-stated-before-write", "child-outside-core", "validation", "rollback-point"],
+    "forbidden": ["child-at-source-root", "child-in-examples-dir", "nested-child-repository", "implicit-publish"]
   }
 ]

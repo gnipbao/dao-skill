@@ -1,3 +1,30 @@
+# Public payload allowlist.
+# Everything else in this working tree is local workspace: generated child
+# Skills, SkillBank and run state (.dao/), outputs, drafts, and nested child
+# repositories. They stay out of Git by default instead of being ignored one
+# directory at a time. Keep this list in sync with ALLOWED_ROOT_FILES,
+# ALLOWED_TOP_LEVEL, and allowed_layout() in scripts/repository_check.py.
+/*
+!/.gitignore
+!/.github/
+!/LICENSE
+!/README.md
+!/SKILL.md
+!/CONTRIBUTING.md
+!/SECURITY.md
+!/test-prompts.json
+!/agents/
+!/assets/
+!/examples/
+!/references/
+!/scripts/
+
+# Public directories are flat; nested folders are local workspace.
+/assets/*/
+/examples/*/
+/references/*/
+/scripts/*/
+
 # Operating-system and editor files
 .DS_Store
 Thumbs.db
@@ -27,21 +54,3 @@ htmlcov/
 *.bak.*
 *.tmp
 *.log
-/.tmp/
-/.firecrawl/
-
-# Runtime-generated user data. These are created while using dao-skill and
-# must remain outside the public source package.
-/.dao/
-/skill-bank/
-/generated-skills/
-/output/
-/runs/
-
-# Independent/generated child skill repositories kept in this maintainer's
-# local workspace. The public repository contains only dao-skill itself.
-/content-to-skill/
-/find-skill/
-/how-to-understand-anything-skill/
-/knowledge-cat-ppt-skill/
-/examples/*/
