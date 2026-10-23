@@ -3,10 +3,11 @@
 
 from __future__ import annotations
 
+import os
 import subprocess
+import sys
 import tempfile
 import unittest
-import os
 from pathlib import Path
 
 import evaluation_check
@@ -237,6 +238,81 @@ policy:
             "agents/openai.yaml interface.short_description must be 25-64 characters",
             repository_check.check_metadata(metadata),
         )
+
+
+# Set on the child process only. run_checks.py executes this file, so a nested
+# invocation must not re-enter these tests, or the recursion described below
+# would be reproduced by the very test that is meant to detect it.
+SKIP_CLI_CONTRACT_TESTS = "DAO_SKIP_CLI_CONTRACT_TESTS"
+
+
+@unittest.skipIf(
+    os.environ.get(SKIP_CLI_CONTRACT_TESTS) == "1",
+    "nested run_checks.py invocation; these tests already run at the top level",
+)
+class RunChecksCliTests(unittest.TestCase):
+    """Argument contract for run_checks.py.
+
+    This entry point used to ignore argv entirely, so `run_checks.py --help`
+    silently ran the whole suite (~1.7s) before returning. Two boundaries must
+    hold once argument parsing exists:
+      - -h/--help returns immediately without running any check
+      - one optional positional path stays accepted, because install.py's
+        validate_staging() invokes this script with the staging path; accepting
+        options only breaks the installer regression tests
+
+    The child environment carries SKIP_CLI_CONTRACT_TESTS so that a run of the
+    full suite cannot recurse back into this class. Breaking the cycle by
+    construction is deliberate: the alternative is cleaning up an unbounded
+    process tree after the fact, which does not work reliably once nested
+    invocations create their own sessions.
+    """
+
+    def _run(self, *args: str) -> subprocess.CompletedProcess[str]:
+        env = {**os.environ, SKIP_CLI_CONTRACT_TESTS: "1"}
+        try:
+            return subprocess.run(
+                [sys.executable, str(Path(__file__).resolve().parent / "run_checks.py"), *args],
+                capture_output=True,
+                text=True,
+                check=False,
+                env=env,
+                timeout=60,
+            )
+        except subprocess.TimeoutExpired:
+            self.fail(
+                f"run_checks.py {' '.join(args)} did not return within 60s: it did "
+                "not handle its arguments and ran the whole suite instead"
+            )
+
+    def test_help_returns_immediately_without_running_checks(self) -> None:
+        for flag in ("-h", "--help"):
+            with self.subTest(flag=flag):
+                result = self._run(flag)
+                self.assertEqual(result.returncode, 0)
+                combined = result.stdout + result.stderr
+                self.assertIn("usage:", combined)
+                # The point: it must not actually run the checks.
+                self.assertNotIn("==>", combined)
+                self.assertNotIn("All checks passed", combined)
+
+    def test_unknown_option_is_rejected(self) -> None:
+        result = self._run("--definitely-not-a-flag")
+        self.assertEqual(result.returncode, 2)
+        self.assertIn("unrecognized arguments", result.stderr)
+
+    def test_positional_path_is_accepted(self) -> None:
+        # This is install.py's call shape. A nonexistent path is enough: it only
+        # proves argparse consumed the positional. The later check failure is
+        # expected and unrelated to this test.
+        result = self._run("/nonexistent/skill/root")
+        combined = result.stdout + result.stderr
+        self.assertNotIn("unrecognized arguments", combined)
+
+    def test_at_most_one_positional_path(self) -> None:
+        result = self._run(".", ".")
+        self.assertEqual(result.returncode, 2)
+        self.assertIn("unrecognized arguments", result.stderr)
 
 
 if __name__ == "__main__":

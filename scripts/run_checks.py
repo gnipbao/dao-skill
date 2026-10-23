@@ -3,14 +3,42 @@
 
 from __future__ import annotations
 
+import argparse
 import os
 import subprocess
 import sys
 from pathlib import Path
 
 
-def main() -> int:
-    root = Path(__file__).resolve().parents[1]
+def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description=__doc__,
+        epilog=(
+            "Use -h/--help to see this message without running anything."
+        ),
+    )
+    # The positional argument is not optional by accident: install.py's
+    # validate_staging() invokes this script as `run_checks.py <staging>`, and
+    # validate_restored_installation() invokes it with no arguments. Rejecting
+    # positionals breaks both. With no argument we fall back to this script's
+    # parent directory, which is the usage SKILL.md documents.
+    parser.add_argument(
+        "path",
+        nargs="?",
+        default=None,
+        help="Path to the skill root to validate (default: this script's parent directory)",
+    )
+    return parser.parse_args(argv)
+
+
+def main(argv: list[str] | None = None) -> int:
+    # Parsing arguments here is not about reading values. It makes -h/--help
+    # return immediately and unknown options fail, instead of silently running
+    # the whole suite: `run_checks.py --help` used to take ~1.7s, unlike the four
+    # sibling checkers.`
+    args = parse_args(sys.argv[1:] if argv is None else argv)
+
+    root = Path(args.path).resolve() if args.path else Path(__file__).resolve().parents[1]
     commands: list[tuple[str, list[str]]] = [
         ("quality", [sys.executable, "scripts/quality_check.py", ".", "--profile", "dao"]),
         ("evolution", [sys.executable, "scripts/evolution_check.py", "."]),
