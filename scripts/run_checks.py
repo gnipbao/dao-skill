@@ -26,6 +26,7 @@ def main() -> int:
                 ),
                 ("installer regression", [sys.executable, "scripts/test_install.py"]),
                 ("validator regression", [sys.executable, "scripts/test_validators.py"]),
+                ("run-state regression", [sys.executable, "scripts/test_run_state.py"]),
             ]
         )
     else:
