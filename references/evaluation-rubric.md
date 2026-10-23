@@ -49,6 +49,7 @@ Rules:
 - E2 can support a publishable candidate verdict when the Trust Gate has no unresolved required item.
 - E3 or E4 is required for a verified publishable verdict.
 - A 95+ benchmark verdict requires E3 or E4; high-risk skills require E4 or an explicit human checkpoint.
+- 评分置信度 is confidence that the score predicts runtime behavior, so it follows the evidence level: E0-E1 低, E2 低 or 中, E3 中 or 高, E4 高. A verdict that is stable regardless of the missing evidence, such as a score far below 70, is stated as a separate sentence; it does not raise confidence.
 
 ## 1. Trust Gate
 
@@ -69,6 +70,11 @@ Gate verdict:
 - `CONDITIONAL`: name the operating condition and user-visible limitation.
 - `PASS`: all required items have evidence and no unresolved critical risk.
 - A content-only skill may mark irrelevant runtime items `N/A`, but must explain why.
+
+Calibration, so independent reviewers reach the same gate verdict:
+
+- `UNKNOWN` means the evidence needed to judge could not be inspected: unread code, an unavailable runtime, an unverifiable remote service. A disclosure that was inspected and found missing, such as no LICENSE or no stated source for bundled material, is `CONDITIONAL` with the fix named as a publication precondition, or `FAIL` when the material is known to be unlicensed.
+- Output-integrity defects, such as fabricated facts or absolute claims in text the user reviews before publishing, are scored under 结果有效性 and 边界与可信披露. They become an `Input and action safety` item only when the skill publishes, sends, or acts on its output without human review, or its workflow is built to produce regulated claims (health, finance, legal).
 
 This is a review gate, not a malware scanner. Static reading cannot prove that code is safe. If sandboxing, dependency scanning, or dynamic execution is unavailable, say so.
 
@@ -166,6 +172,8 @@ deployment verdict = numeric band constrained by Trust Gate and evidence level
 - Required Trust item `UNKNOWN` -> assessment incomplete; no publishable verdict.
 - E0 -> orientation only.
 - E1 -> structural estimate only, even when the number is high.
+- Score < 70 + Trust eligible + E2/E3/E4 -> 不可发布. This is a quality verdict; reserve 拒绝 for a Trust `FAIL`.
+- Score 70-84 + Trust eligible + E2/E3/E4 -> MVP（限定环境）.
 - Score >= 85 + Trust eligible + E2 -> publishable candidate, not verified publishable.
 - Score >= 85 + Trust PASS/justified CONDITIONAL + E3/E4 -> verified publishable.
 - Score >= 95 + Trust PASS + E3/E4 -> benchmark candidate; high-risk use still needs an independent/human gate.
@@ -190,7 +198,7 @@ These fields explain deployment readiness; they do not add bonus points.
 ## 道.skill 评估
 总分：/100
 数值等级：不可发布 / MVP / 可发布候选 / 标杆候选
-最终判定：拒绝 / 评估不完整 / 结构估分 / 可发布候选 / 已验证可发布 / 标杆候选
+最终判定：拒绝（Trust FAIL） / 评估不完整 / 结构估分 / 不可发布 / MVP（限定环境） / 可发布候选 / 已验证可发布 / 标杆候选
 评估模式：E0 / E1 / E2 / E3 / E4
 评分置信度：低 / 中 / 高
 

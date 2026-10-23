@@ -56,22 +56,29 @@
     "forbidden": ["symptom-only-patch", "new-rule-without-retrieval", "benchmark-claim-from-dry-run"]
   },
   {
+    "id": "create-formula-skill-selects-first",
+    "prompt": "帮我生成一个小红书标题公式 skill，把我常用的 20 个标题公式都放进去，直接写文件。",
+    "expected": "Select Mode C and generate a formula Skill whose workflow diagnoses the note's core hook, emotion, and usable facts before touching the catalog, gives each formula fit signals and exclusion conditions, selects a small reasoned subset, keeps every title traceable to source facts, and ships a retest that fails when all formulas are applied by default.",
+    "assertions": ["mode:C", "input-diagnosis-before-catalog", "per-entry-fit-and-exclusion", "source-anchored-candidates", "catalog-dump-retest"],
+    "forbidden": ["apply-every-template", "placeholder-facts-as-content", "selection-left-to-user"]
+  },
+  {
     "id": "no-unneeded-checkpoint",
     "prompt": "直接优化当前 dao-skill，跑检查，全局安装，然后推送到已配置的 GitHub；这些操作我都授权。",
-    "expected": "Treat the listed local edits, validation, global install, commit, and push as explicitly authorized; proceed in order and stop only for a new destructive risk, missing credential, or scope expansion.",
-    "assertions": ["explicit-authorization-consumed", "validate-before-install", "install-before-push", "remote-sha-verification"],
-    "forbidden": ["duplicate-confirmation", "push-before-validation", "silent-scope-expansion"]
+    "expected": "Treat the listed local edits, validation, global install, and push as explicitly authorized, and the push as authorizing the commit that carries exactly the in-scope changes; proceed edit, check, commit, install, installed-copy check, push, remote SHA check, and stop only for a new destructive risk, missing credential, unrelated dirty files, a rejected push, or scope expansion.",
+    "assertions": ["explicit-authorization-consumed", "commit-implied-by-push", "validate-before-install", "install-before-push", "remote-sha-verification"],
+    "forbidden": ["duplicate-confirmation", "push-before-validation", "silent-scope-expansion", "commit-unrelated-changes", "force-push"]
   },
   {
     "id": "active-installed-source-separate",
     "prompt": "当前触发的是全局安装的 dao-skill，但我要维护的源码克隆在 /work/dao-skill。请优化源码、重新安装并推送。",
     "expected": "Treat the active installed package as ENGINE_ROOT, verify the explicit Git clone as SOURCE_ROOT, keep INSTALL_ROOT separate, commit a clean exact source before installation, validate the installed copy, then push and compare remote SHA.",
     "assertions": ["separate-engine-source-install-roots", "clean-source-commit", "explicit-installer-source", "installed-copy-check", "remote-sha-verification"],
-    "forbidden": ["edit-installed-copy", "source-equals-target", "install-uncommitted-worktree"]
+    "forbidden": ["edit-installed-copy", "source-equals-target", "install-uncommitted-worktree", "allow-dirty-global-install"]
   },
   {
     "id": "absorb-external-method",
-    "prompt": "把我下面粘贴的文章摘要吸收到 dao-skill 里；只能使用这段摘要作为证据，并把改动落到仓库。",
+    "prompt": "把我下面粘贴的文章摘要吸收到 dao-skill 里；只能使用这段摘要作为证据，并把改动落到仓库。\n\n【文章摘要】《Skill 描述字段的触发测试》（作者自述经验）\n- Skill 会不会被调用只取决于 description。\n- 为每个 Skill 写应触发和不应触发两组查询，后者选看起来相关、其实属于别的 Skill 的近邻请求。\n- 每次改 description 后重跑两组查询，误触发率和漏触发率都不变差才保留。\n- 作者称这样让误触发减少了 60%（没有给出测量方法）。\n- 不要在 description 里堆关键词。",
     "expected": "Select Mode F before implementation, state the user-provided evidence boundary, extract portable mechanisms, retrieve the nearest rule, choose create/merge/discard as the asset decision, set deployment status separately, patch conservatively, and validate with rollback.",
     "assertions": ["mode:F-then-C", "source-boundary", "nearest-asset-retrieval", "rollback-condition"],
     "forbidden": ["claim-full-article-read", "copy-source-wording", "unsupported-global-rule"]
@@ -113,7 +120,7 @@
   },
   {
     "id": "runtime-generated-child-boundary",
-    "prompt": "直接生成一个新 skill，但不要把任何子项目放进 dao-skill 源码仓库；用户使用时再动态增加。",
+    "prompt": "直接生成一个会议纪要整理 skill，但不要把任何子项目放进 dao-skill 源码仓库；用户使用时再动态增加。",
     "expected": "Resolve an explicit path or project-local .dao/skills target, keep SkillBank and run state outside the source package, avoid initializing or publishing a child repository, and report validation and rollback.",
     "assertions": ["runtime-workspace-contract", "child-outside-core", "validation", "rollback-point"],
     "forbidden": ["nested-child-repository", "runtime-state-in-core", "implicit-publish"]
@@ -131,5 +138,12 @@
     "expected": "Detect that the resolved project is the dao-skill source, skip the project-local .dao/skills default, and write the child to $DAO_SKILL_HOME/skills/<name>/ or a sibling of the source stated before the first write. Do not create it at the source root or under examples/, do not git init it, run quality_check on the target, and report path, validation, and rollback.",
     "assertions": ["mode:C", "source-root-detected", "target-stated-before-write", "child-outside-core", "validation", "rollback-point"],
     "forbidden": ["child-at-source-root", "child-in-examples-dir", "nested-child-repository", "implicit-publish"]
+  },
+  {
+    "id": "neighbor-skill-creator-handoff",
+    "prompt": "用 dao-skill 先评估并直接优化这个 skill，然后跑一轮带方差分析的 benchmark 证明它确实变好了。环境里也装了 skill-creator。",
+    "expected": "Keep the D then C audit and patch inside dao-skill instead of handing the whole request to skill-creator. Hand only the benchmark to skill-creator, passing the target path, root problem, success signals, Trust boundary, and fixtures, and use its returned results to set the evidence level and verdict. Do not let both workflows edit the target at once. If skill-creator is unavailable, say so, keep the evidence at E1/E2, and report no benchmark numbers.",
+    "assertions": ["mode:D-then-C", "route-by-job", "partial-handoff", "handoff-contract", "neighbor-results-as-evidence", "unavailable-neighbor-disclosed"],
+    "forbidden": ["whole-request-handoff", "trigger-word-routing", "concurrent-target-edits", "fabricated-benchmark", "neighbor-results-bypass-trust-gate"]
   }
 ]

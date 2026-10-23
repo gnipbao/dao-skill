@@ -23,6 +23,9 @@ REQUIRED_CASES = {
     "active-installed-source-separate",
     "runtime-generated-child-boundary",
     "child-target-when-cwd-is-dao-source",
+    "neighbor-skill-creator-handoff",
+    "source-meaning-confirmation-before-production",
+    "create-formula-skill-selects-first",
     "trust-gate-overrides-score",
     "structural-score-is-not-runtime-proof",
     "public-ready-skill-repo",
@@ -35,6 +38,7 @@ REQUIRED_SKILL_MARKERS = (
     "### Compound Requests",
     "## Optimization Contract",
     "explicitly authorized",
+    "A push request authorizes the commit it needs",
     "## Completion Contract",
     "references/runtime-workspace.md",
 )
@@ -54,7 +58,11 @@ REQUIRED_CASE_RULES = {
             "feature-bloat",
             "unrequested-external-action",
         },
-    }
+    },
+    "no-unneeded-checkpoint": {
+        "assertions": {"commit-implied-by-push", "validate-before-install", "install-before-push"},
+        "forbidden": {"duplicate-confirmation", "force-push"},
+    },
 }
 
 

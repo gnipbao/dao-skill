@@ -45,7 +45,7 @@ resolve verified source -> source status -> source patch -> full source checks
 
 `ENGINE_ROOT` is the real directory containing the active `SKILL.md`. `SOURCE_ROOT` is an explicit or verified dao-skill Git root. `INSTALL_ROOT` is the selected global installation target. Never infer `SOURCE_ROOT` from `ENGINE_ROOT` alone; an installed copy is not a maintenance checkout.
 
-The installer must copy only the curated public payload, validate staging before replacement, keep the previous installation outside `${CODEX_HOME}/skills/`, and restore it if activation fails.
+An authorized push also authorizes the commit that carries exactly the in-scope changes. The installer must copy only the curated public payload, refuse a Git source with uncommitted or untracked changes unless `--allow-dirty` targets a disposable test location, write a path-free `.dao-install.json` receipt (source commit and per-file SHA-256) that `install.py --verify` and installed-mode `run_checks.py` check, validate staging before replacement, keep the previous installation outside `${CODEX_HOME}/skills/`, and restore it if activation fails.
 
 ## Runtime State
 

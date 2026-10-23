@@ -109,7 +109,9 @@ python3 scripts/install.py --target ~/.claude/skills/dao-skill --dry-run
 python3 scripts/install.py --target ~/.claude/skills/dao-skill
 ```
 
-`main` 会持续演进；需要完全可复现的安装时，请在安装前检出一个已验证的 tag 或 commit SHA。
+安装器会拒绝经过符号链接的目标路径。如果 `~/.claude/skills` 是某个工具建的符号链接，请把它指向的真实目录作为 `--target`（`readlink ~/.claude/skills` 可以查看）。
+
+`main` 会持续演进；需要完全可复现的安装时，请在安装前检出一个已验证的 tag 或 commit SHA。安装器会拒绝含未提交或未跟踪改动的 Git 源码，并在 dry-run 与安装输出里打印所用 commit；`--allow-dirty` 只用于一次性的测试目标。每次安装都会写入 `.dao-install.json` 回执（commit 与逐文件哈希，不含本机路径）；用 `python3 scripts/install.py --verify --target <安装目录>` 可以确认安装副本来自哪个 commit、有没有被手改。
 
 ## 第一次调用
 
